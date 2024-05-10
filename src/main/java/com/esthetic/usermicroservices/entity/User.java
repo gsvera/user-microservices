@@ -18,7 +18,6 @@ import java.util.Date;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     @Column(name = "first_name")
     private String firstName;
@@ -31,6 +30,8 @@ public class User implements UserDetails {
     private String password;
     @Column(name = "id_profile")
     private int idProfile;
+
+    private String token;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
