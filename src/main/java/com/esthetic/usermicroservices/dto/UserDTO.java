@@ -1,5 +1,6 @@
 package com.esthetic.usermicroservices.dto;
 
+import com.esthetic.usermicroservices.entity.User;
 import jakarta.persistence.Id;
 import lombok.*;
 
@@ -19,15 +20,17 @@ public class UserDTO {
     private String phone;
     private String password;
     private int idProfile;
-    private String nameProfile = null;
 
-    public UserDTO(String id, String firstName, String lastName, String email, Date birthDate, String phone, int idProfile) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.birthDate = birthDate;
-        this.phone = phone;
-        this.idProfile = idProfile;
+    private String token;
+    private CatalogProfileDTO catalogProfileDTO = null;
+
+    public UserDTO(Optional<User> user){
+        this.id = user.get().getId();
+        this.firstName = user.get().getFirstName();
+        this.lastName = user.get().getLastName();
+        this.email = user.get().getEmail();
+        this.birthDate = user.get().getBirthDate();
+        this.phone = user.get().getPhone();
+        this.idProfile = user.get().getIdProfile();
     }
 }

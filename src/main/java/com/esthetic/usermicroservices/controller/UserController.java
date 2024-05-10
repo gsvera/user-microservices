@@ -1,5 +1,6 @@
 package com.esthetic.usermicroservices.controller;
 
+import com.esthetic.usermicroservices.clases.RequestTokenReset;
 import com.esthetic.usermicroservices.dto.LoginRequestDTO;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
@@ -35,6 +36,30 @@ public class UserController {
         } catch(Exception ex) {
             response.error = true;
             response.message = ex.getMessage();
+        }
+        return response;
+    }
+    @PostMapping("/request-reset-password")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO RequestResetPassword(@RequestBody RequestTokenReset requestData) {
+        ResponseDTO response = new ResponseDTO();
+        try{
+            response.error = userService.SendResetPassword(requestData).error;
+
+        }catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            response.error = true;
+        }
+        return response;
+    }
+    @PostMapping("/save-reset-password")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO SaveResetPassword(@RequestBody RequestTokenReset requestData) {
+        ResponseDTO response = new ResponseDTO();
+        try{
+            response.error = userService.SaveResetPassword(requestData).error;
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
         }
         return response;
     }
