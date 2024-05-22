@@ -1,6 +1,7 @@
 package com.esthetic.usermicroservices.controller;
 
 import com.esthetic.usermicroservices.dto.ResponseDTO;
+import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,18 @@ public class UserAuthController {
         } catch(Exception ex) {
             response.error = true;
             System.out.print(ex.getMessage());
+        }
+        return response;
+    }
+    @RequestMapping("/update-personel-information")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO UpdatePersonalInformation(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestBody UserDTO userDTO) {
+        ResponseDTO response = new ResponseDTO();
+        try{
+            userService.UpdatePersonalInformation(token, userDTO);
+        } catch(Exception ex) {
+            response.error = true;
+            System.out.println(ex.getMessage());
         }
         return response;
     }

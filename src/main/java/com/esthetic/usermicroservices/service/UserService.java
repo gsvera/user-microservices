@@ -2,6 +2,10 @@ package com.esthetic.usermicroservices.service;
 
 import com.esthetic.usermicroservices.clases.RequestTokenReset;
 import com.esthetic.usermicroservices.dto.*;
+import com.esthetic.usermicroservices.entity.CatalogPlan;
+import com.esthetic.usermicroservices.entity.UserPlan;
+import com.esthetic.usermicroservices.repository.CatalogPlanRepository;
+import com.esthetic.usermicroservices.repository.UserPlanRepository;
 import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,8 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final MailService mailService;
     private final ResetTokenService resetTokenService;
+    private final CatalogPlanRepository catalogPlanRepository;
+    private final UserPlanRepository userPlanRepository;
     @Value("${url.front}")
     public String urlFront;
 
@@ -55,10 +61,18 @@ public class UserService {
         newUser.setLastName(objUser.getLastName());
         newUser.setEmail(objUser.getEmail());
         newUser.setBirthDate(objUser.getBirthDate());
+        newUser.setLada(objUser.getLada());
         newUser.setPhone(objUser.getPhone());
         newUser.setPassword(encodedPassword);
         newUser.setIdProfile(objUser.getIdProfile());
         userRepository.save(newUser);
+
+//        SE HARDCODEA EL "1" QUE ES EL ID DEL PERFIL PROVEEDOR
+        if(objUser.getIdProfile() > 1) {
+            Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));
+            UserPlan userPlan = new UserPlan(newUser.getId(), catalogPlan.get().getId(), catalogPlan.get().getDuration());
+            userPlanRepository.save(userPlan);
+        }
 
         String token = jwtService.GetToken(newUser);
 
@@ -67,6 +81,20 @@ public class UserService {
         ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser.getIdProfile());
 
         return ResponseDTO.builder().items(response).build();
+    }
+    public ResponseDTO UpdatePersonalInformation(String token, UserDTO objUser) {
+        Optional<User> user = userRepository.findByToken(token.substring(7));
+
+        userRepository.updateInformationPersonel(
+                objUser.getFirstName(),
+                objUser.getLastName(),
+                objUser.getBirthDate(),
+                objUser.getLada(),
+                objUser.getPhone(),
+                user.get().getId()
+        );
+
+        return ResponseDTO.builder().error(true).build();
     }
     public User FindUserDuplicate(UserDTO userDto) {
         return userRepository.findByEmailQueryNative(userDto.getEmail(), userDto.getPhone());
