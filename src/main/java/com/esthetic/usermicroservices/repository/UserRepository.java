@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.esthetic.usermicroservices.entity.User;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -20,4 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional @Modifying
     @Query(value = "UPDATE tbl_user u SET u.password = ?1 WHERE u.email = ?2", nativeQuery = true)
     int updatePasswordByEmail(String password, String email);
+    @Transactional @Modifying
+    @Query(value = "UPDATE tbl_user u SET u.first_name = ?1, u.last_name = ?2, u.birth_date = ?3, u.lada = ?4, u.phone = ?5 WHERE u.id = ?6", nativeQuery = true)
+    int updateInformationPersonel(String firstName, String lastName, Date birthDate, String lada, String phone, String id);
 }

@@ -17,11 +17,12 @@ public class UserDTO {
     private String lastName;
     private String email;
     private Date birthDate;
+    private String lada;
     private String phone;
     private String password;
     private int idProfile;
-
     private String token;
+    private int planSelect;
     private CatalogProfileDTO catalogProfileDTO = null;
 
     public UserDTO(Optional<User> user){
@@ -30,6 +31,7 @@ public class UserDTO {
         this.lastName = user.get().getLastName();
         this.email = user.get().getEmail();
         this.birthDate = user.get().getBirthDate();
+        this.lada = user.get().getLada();
         this.phone = user.get().getPhone();
         this.idProfile = user.get().getIdProfile();
     }
