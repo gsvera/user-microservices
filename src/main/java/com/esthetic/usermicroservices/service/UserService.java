@@ -120,7 +120,11 @@ public class UserService {
             return ResponseDTO.builder().error(true).message("Pass invalid").build();
         }
     }
+    public ResponseDTO Logout(String token) {
+        userRepository.updateToken(token.substring(7));
 
+        return ResponseDTO.builder().error(false).build();
+    }
     public UserDTO GetUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
 

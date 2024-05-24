@@ -37,12 +37,24 @@ public class UserAuthController {
         }
         return response;
     }
-    @RequestMapping("/update-personel-information")
+    @PutMapping("/update-personel-information")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO UpdatePersonalInformation(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestBody UserDTO userDTO) {
         ResponseDTO response = new ResponseDTO();
         try{
             userService.UpdatePersonalInformation(token, userDTO);
+        } catch(Exception ex) {
+            response.error = true;
+            System.out.println(ex.getMessage());
+        }
+        return response;
+    }
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO Logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        ResponseDTO response = new ResponseDTO();
+        try{
+            userService.Logout(token);
         } catch(Exception ex) {
             response.error = true;
             System.out.println(ex.getMessage());
