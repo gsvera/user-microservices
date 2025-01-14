@@ -22,6 +22,7 @@ public class UserDTO {
     private String password;
     private int idProfile;
     private String token;
+    private String profilePictureB64;
     private int planSelect;
     private CatalogProfileDTO catalogProfileDTO = null;
 
@@ -34,5 +35,6 @@ public class UserDTO {
         this.lada = user.get().getLada();
         this.phone = user.get().getPhone();
         this.idProfile = user.get().getIdProfile();
+        this.profilePictureB64 = user.get().getProfilePictureB64();
     }
 }

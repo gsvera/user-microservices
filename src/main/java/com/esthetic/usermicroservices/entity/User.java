@@ -34,6 +34,8 @@ public class User implements UserDetails {
     @Column(name = "id_profile")
     private int idProfile;
     private String token;
+    @Column(name = "profile_picture_b64")
+    private String profilePictureB64;
 
     public User(Optional<User> user){
         this.id = user.get().getId();
