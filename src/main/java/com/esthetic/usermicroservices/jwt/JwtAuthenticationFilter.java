@@ -1,13 +1,10 @@
 package com.esthetic.usermicroservices.jwt;
 
-import com.esthetic.usermicroservices.entity.User;
 import com.esthetic.usermicroservices.service.JwtService;
-import com.esthetic.usermicroservices.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

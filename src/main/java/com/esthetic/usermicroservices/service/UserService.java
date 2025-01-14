@@ -88,13 +88,25 @@ public class UserService {
         userRepository.updateInformationPersonel(
                 objUser.getFirstName(),
                 objUser.getLastName(),
-                objUser.getBirthDate(),
-                objUser.getLada(),
+//                objUser.getBirthDate(), // No se ocupa por ahora
+//                objUser.getLada(), // Se comenta por que por ahora solo es para telefonos locales
                 objUser.getPhone(),
+                objUser.getEmail(),
                 user.get().getId()
         );
 
-        return ResponseDTO.builder().error(true).build();
+        return ResponseDTO.builder().error(false).build();
+    }
+
+    public ResponseDTO findUser(String email, String phone) {
+        Optional<User> user = Optional.ofNullable(userRepository.findByEmailQueryNative(email, phone)) ;
+        System.out.println("datos encontrados " +user);
+        if(user.isPresent()) {
+            return ResponseDTO.builder().error(true).message("Ya existe un usuario con esos datos").build();
+        }
+        else {
+            return ResponseDTO.builder().error(false).message("No existe el usuario con los datos proporcionados").build();
+        }
     }
     public User FindUserDuplicate(UserDTO userDto) {
         return userRepository.findByEmailQueryNative(userDto.getEmail(), userDto.getPhone());
@@ -121,8 +133,11 @@ public class UserService {
         }
     }
     public ResponseDTO Logout(String token) {
-        userRepository.updateToken(token.substring(7));
-
+        System.out.println(token);
+        int updatedRows = userRepository.updateToken(token.substring(7));
+        if(updatedRows == 0) {
+            return ResponseDTO.builder().error(true).message("No se encontro el usuairo").build();
+        }
         return ResponseDTO.builder().error(false).build();
     }
     public UserDTO GetUserById(Long id) {
