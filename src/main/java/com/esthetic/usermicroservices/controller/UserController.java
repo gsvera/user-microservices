@@ -15,6 +15,19 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/find-duplicated-user")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO findDuplicatedUser(@RequestParam String email, @RequestParam String phone) {
+        ResponseDTO response = new ResponseDTO();
+        try{
+            return userService.findUser(email, phone);
+        } catch(Exception ex) {
+            response.error = true;
+            response.message = "Ocurrio un error intentelo mas tarde";
+        }
+        return response;
+    }
+
     @PostMapping("/save")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO SaveUser(@RequestBody UserDTO userDTO) {

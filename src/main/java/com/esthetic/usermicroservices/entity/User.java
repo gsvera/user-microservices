@@ -1,5 +1,6 @@
 package com.esthetic.usermicroservices.entity;
 
+import com.esthetic.usermicroservices.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -7,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 @Entity
 @Data
@@ -26,12 +28,27 @@ public class User implements UserDetails {
     private String email;
     @Column(name = "birth_date")
     private Date birthDate;
+    private String lada;
     private String phone;
     private String password;
     @Column(name = "id_profile")
     private int idProfile;
-
     private String token;
+    @Column(name = "profile_picture_b64")
+    private String profilePictureB64;
+
+    public User(Optional<User> user){
+        this.id = user.get().getId();
+        this.firstName = user.get().getFirstName();
+        this.lastName = user.get().getLastName();
+        this.email = user.get().getEmail();
+        this.birthDate = user.get().getBirthDate();
+        this.lada = user.get().getLada();
+        this.phone = user.get().getPhone();
+        this.password = user.get().getPassword();
+        this.idProfile = user.get().getIdProfile();
+        this.token = user.get().getToken();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
