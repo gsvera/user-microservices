@@ -12,13 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -70,7 +69,12 @@ public class UserService {
 //        SE HARDCODEA EL "1" QUE ES EL ID DEL PERFIL PROVEEDOR
         if(objUser.getIdProfile() > 1) {
             Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));
-            UserPlan userPlan = new UserPlan(newUser.getId(), catalogPlan.get().getId(), catalogPlan.get().getDuration());
+            UserPlan userPlan = new UserPlan(
+                    newUser.getId(),
+                    catalogPlan.get().getId(),
+                    catalogPlan.get().getDuration(),
+                    Timestamp.from(Instant.now())
+            );
             userPlanRepository.save(userPlan);
         }
 
@@ -98,6 +102,26 @@ public class UserService {
         return ResponseDTO.builder().error(false).build();
     }
 
+        public ResponseDTO _UpdatePassword(String token, String newPassword) {
+        Optional<User> user = userRepository.findByToken(token.substring(7));
+
+        if(user.isPresent()) {
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            boolean isPasswordMatch = passwordEncoder.matches(newPassword, user.get().getPassword());
+            if(isPasswordMatch) {
+                return ResponseDTO.builder().error(true).message("La contraseña no puede ser la misma que la anterior").build();
+            } else {
+                String newPasswordEncode = passwordEncoder.encode(newPassword);
+                int updatePassword = userRepository.updatePasswordByEmail(newPasswordEncode, user.get().getEmail());
+                if(updatePassword == 0) {
+                    return ResponseDTO.builder().error(true).message("Su session ha vencido, inicie session e intente nuevamente").build();
+                } else {
+                    return ResponseDTO.builder().error(false).message("Contraseña actualizada con éxito").build();
+                }
+            }
+        }
+        return ResponseDTO.builder().error(true).message("Su session ha vencido, inicie session e intente nuevamente").build();
+    }
     public ResponseDTO findUser(String email, String phone) {
         Optional<User> user = Optional.ofNullable(userRepository.findByEmailQueryNative(email, phone)) ;
         System.out.println("datos encontrados " +user);

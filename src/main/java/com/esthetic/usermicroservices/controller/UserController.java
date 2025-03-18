@@ -36,7 +36,8 @@ public class UserController {
             return userService.SaveUser(userDTO);
         } catch (Exception ex) {
             response.error = true;
-            response.message = ex.getMessage();
+            response.message = "Ocurrio un error intentelo mas tarde";
+            System.out.println(ex.getMessage());
         }
         return response;
     }

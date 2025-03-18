@@ -19,9 +19,10 @@ public class UserPlan {
     private Timestamp createdDate;
     private int duration;
 
-    public UserPlan(String idUser, int idPlan, int duration) {
+    public UserPlan(String idUser, int idPlan, int duration, Timestamp createdDate) {
         this.idUser = idUser;
         this.idPlan = idPlan;
         this.duration = duration;
+        this.createdDate = createdDate;
     }
 }

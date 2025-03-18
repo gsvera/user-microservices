@@ -14,5 +14,5 @@ public class CatalogPlan {
     private String descriptionEn;
     private double price;
     private int duration;
-    private int active;
+    private Boolean active;
 }

@@ -49,6 +49,18 @@ public class UserAuthController {
         }
         return response;
     }
+    @PutMapping("/update-password-by-user")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO UpdatePasswordByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestParam(name = "new-password") String newPassword) {
+        ResponseDTO response = new ResponseDTO();
+        try{
+            return userService._UpdatePassword(token, newPassword);
+        } catch(Exception ex){
+            response.error = true;
+            System.out.println(ex.getMessage());
+        }
+        return response;
+    }
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO Logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){

@@ -16,18 +16,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long id);
     Optional<User> findByToken(String token);
     @Transactional @Modifying
-    @Query(value = "UPDATE tbl_user u SET u.token = ?2 WHERE u.id = ?1", nativeQuery = true)
+    @Query(value = "UPDATE tbl_user SET token = ?2 WHERE id = ?1", nativeQuery = true)
     int updateTokenById(String id, String token);
     @Transactional @Modifying
-    @Query(value = "UPDATE tbl_user u SET u.password = ?1 WHERE u.email = ?2", nativeQuery = true)
+    @Query(value = "UPDATE tbl_user SET password = ?1 WHERE email = ?2", nativeQuery = true)
     int updatePasswordByEmail(String password, String email);
     @Transactional @Modifying
-    @Query(value = "UPDATE tbl_user u SET u.first_name = ?1, u.last_name = ?2, u.phone = ?3, u.email = ?4 WHERE u.id = ?5", nativeQuery = true)
+    @Query(value = "UPDATE tbl_user SET first_name = ?1, last_name = ?2, phone = ?3, email = ?4 WHERE id = ?5", nativeQuery = true)
     int updateInformationPersonel(String firstName, String lastName, String phone, String email, String id);
     @Transactional @Modifying
-    @Query(value = "UPDATE tbl_user u SET u.profile_picture_b64 = ?2 WHERE u.token = ?1", nativeQuery = true)
+    @Query(value = "UPDATE tbl_user SET profile_picture_b64 = ?2 WHERE token = ?1", nativeQuery = true)
     int updateProfilePicture(String token, String imgB64);
     @Transactional @Modifying
-    @Query(value = "UPDATE tbl_user u SET u.token = '' WHERE u.token = ?1", nativeQuery = true)
+    @Query(value = "UPDATE tbl_user SET token = '' WHERE token = ?1", nativeQuery = true)
     int updateToken(String token);
 }
