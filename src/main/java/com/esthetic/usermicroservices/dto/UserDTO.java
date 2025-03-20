@@ -11,7 +11,6 @@ import java.util.Optional;
 @AllArgsConstructor
 @Data
 public class UserDTO {
-    @Id
     private String id;
     private String firstName;
     private String lastName;
@@ -25,7 +24,6 @@ public class UserDTO {
     private String profilePictureB64;
     private int planSelect;
     private CatalogProfileDTO catalogProfileDTO = null;
-
     public UserDTO(Optional<User> user){
         this.id = user.get().getId();
         this.firstName = user.get().getFirstName();
@@ -36,5 +34,15 @@ public class UserDTO {
         this.phone = user.get().getPhone();
         this.idProfile = user.get().getIdProfile();
         this.profilePictureB64 = user.get().getProfilePictureB64();
+    }
+    public UserDTO(User user) {
+        this.id = user.getId();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.email = user.getEmail();
+        this.idProfile = user.getIdProfile();
+        this.profilePictureB64 = user.getProfilePictureB64();
+        this.lada = user.getLada();
+        this.phone = user.getPhone();
     }
 }

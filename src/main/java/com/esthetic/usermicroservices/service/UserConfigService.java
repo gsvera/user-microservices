@@ -1,9 +1,12 @@
 package com.esthetic.usermicroservices.service;
 
 import com.esthetic.usermicroservices.dto.ResponseDTO;
+import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.dto.UserLocationDTO;
+import com.esthetic.usermicroservices.entity.User;
 import com.esthetic.usermicroservices.entity.UserLocation;
 import com.esthetic.usermicroservices.repository.UserLocationRepository;
+import com.esthetic.usermicroservices.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserConfigService {
     private final UserLocationRepository userLocationRepository;
+    private final UserRepository userRepository;
 
     public ResponseDTO _GetLocationByUser(String idUser) {
         Optional<UserLocation> userLocation = userLocationRepository.findByIdUser(idUser);
@@ -34,6 +38,14 @@ public class UserConfigService {
             userLocationRepository.save(new UserLocation(userLocationDTO)).getId();
         }
         return ResponseDTO.builder().error(false).message("Se ha guardado la ubicación con éxito").build();
-
+    }
+    public ResponseDTO _SaveprofilePicture(UserDTO userDTO) {
+        Optional<User> user = userRepository.findById(userDTO.getId());
+        if(user.isPresent()) {
+            user.orElseThrow().setProfilePictureB64(userDTO.getProfilePictureB64());
+            userRepository.save(user.get());
+            return ResponseDTO.builder().message("Imagen actualizada con éxito").build();
+        }
+        return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
     }
 }

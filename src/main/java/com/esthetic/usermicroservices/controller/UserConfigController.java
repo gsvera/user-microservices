@@ -1,6 +1,7 @@
 package com.esthetic.usermicroservices.controller;
 
 import com.esthetic.usermicroservices.dto.ResponseDTO;
+import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.dto.UserLocationDTO;
 import com.esthetic.usermicroservices.service.UserConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,14 @@ public class UserConfigController
             System.out.println(ex.getMessage());
         }
         return response;
+    }
+    @PutMapping("/save-profile-picture")
+    public ResponseDTO saveProfilePicture(@RequestBody UserDTO userDTO) {
+        try{
+            return userConfigService._SaveprofilePicture(userDTO);
+        }catch(Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message(ex.getMessage()).build();
+        }
     }
 }
