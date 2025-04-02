@@ -6,6 +6,7 @@ import com.esthetic.usermicroservices.entity.CatalogPlan;
 import com.esthetic.usermicroservices.entity.UserPlan;
 import com.esthetic.usermicroservices.repository.CatalogPlanRepository;
 import com.esthetic.usermicroservices.repository.UserPlanRepository;
+import com.esthetic.usermicroservices.utils.EncrypDecrypCode;
 import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class UserService {
     @Autowired
     private CatalogProfileService catalogProfileService;
 
-    public ResponseDTO SaveUser(UserDTO objUser) {
+    public ResponseDTO SaveUser(UserDTO objUser) throws Exception {
         Optional<User> user = Optional.ofNullable(this.FindUserDuplicate(objUser));
 
         if(user.isPresent()) {
@@ -50,9 +51,9 @@ public class UserService {
         }
 
         UUID uuid = UUID.randomUUID();
-
+        String decryptPass = EncrypDecrypCode.passwordDecrypt(objUser.getPassword());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String encodedPassword = encoder.encode(objUser.getPassword());
+        String encodedPassword = encoder.encode(decryptPass);
 
         User newUser = new User();
         newUser.setId(uuid.toString());
@@ -102,16 +103,16 @@ public class UserService {
         return ResponseDTO.builder().error(false).build();
     }
 
-        public ResponseDTO _UpdatePassword(String token, String newPassword) {
+        public ResponseDTO _UpdatePassword(String token, String newPassword) throws Exception {
         Optional<User> user = userRepository.findByToken(token.substring(7));
-
+        String decryptPass = EncrypDecrypCode.passwordDecrypt(newPassword);
         if(user.isPresent()) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            boolean isPasswordMatch = passwordEncoder.matches(newPassword, user.get().getPassword());
+            boolean isPasswordMatch = passwordEncoder.matches(decryptPass, user.get().getPassword());
             if(isPasswordMatch) {
                 return ResponseDTO.builder().error(true).message("La contraseña no puede ser la misma que la anterior").build();
             } else {
-                String newPasswordEncode = passwordEncoder.encode(newPassword);
+                String newPasswordEncode = passwordEncoder.encode(decryptPass);
                 int updatePassword = userRepository.updatePasswordByEmail(newPasswordEncode, user.get().getEmail());
                 if(updatePassword == 0) {
                     return ResponseDTO.builder().error(true).message("Su session ha vencido, inicie session e intente nuevamente").build();
@@ -136,25 +137,25 @@ public class UserService {
         return userRepository.findByEmailQueryNative(userDto.getEmail(), userDto.getPhone());
     }
 
-    public ResponseDTO Login(LoginRequestDTO loginRequestDTO) {
+    public ResponseDTO _Login(LoginRequestDTO loginRequestDTO) throws Exception {
+            User user = userRepository.findByEmail(loginRequestDTO.getUsername()).orElseThrow();
+            //      PARA VALIDAR QUE EL PASSWORD SEA EL MISMO
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String decryptPass = EncrypDecrypCode.passwordDecrypt(loginRequestDTO.password);
 
-        User user = userRepository.findByEmail(loginRequestDTO.getUsername()).orElseThrow();
+            boolean passwordsMatch = encoder.matches(decryptPass, user.getPassword());
 
-        //      PARA VALIDAR QUE EL PASSWORD SEA EL MISMO
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        boolean passwordsMatch = encoder.matches(loginRequestDTO.password, user.getPassword());
+            if(passwordsMatch) {
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), decryptPass));
+                String token = jwtService.GetToken(user);
 
-        if(passwordsMatch) {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), loginRequestDTO.getPassword()));
-            String token = jwtService.GetToken(user);
+                userRepository.updateTokenById(user.getId(),token);
+                ResponseLoginDTO response = new ResponseLoginDTO(token, user.getIdProfile());
 
-            userRepository.updateTokenById(user.getId(),token);
-            ResponseLoginDTO response = new ResponseLoginDTO(token, user.getIdProfile());
-
-            return ResponseDTO.builder().items(response).build();
-        } else {
-            return ResponseDTO.builder().error(true).message("Pass invalid").build();
-        }
+                return ResponseDTO.builder().items(response).build();
+            } else {
+                return ResponseDTO.builder().error(true).message("Pass invalid").build();
+            }
     }
     public ResponseDTO Logout(String token) {
         System.out.println(token);
