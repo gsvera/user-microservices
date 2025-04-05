@@ -15,15 +15,21 @@ public class UserConfigController
     private UserConfigService userConfigService;
     @GetMapping("/get-location-by-user")
     public ResponseDTO getLocationByUser(@RequestParam(name = "id-user") String idUser) {
-        ResponseDTO response = new ResponseDTO();
         try{
             return userConfigService._GetLocationByUser(idUser);
         } catch (Exception ex) {
-            response.error = true;
-            response.message = "Ocurrio un error intentelo mas tarde";
             System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return response;
+    }
+    @GetMapping("/get-my-current-plan/{id-user}")
+    public ResponseDTO GetMyCurrentPlan(@PathVariable("id-user") String idUser) {
+        try{
+            return userConfigService._GetMyCurrentPlan(idUser);
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
     }
     @PostMapping("/save-location")
     public ResponseDTO saveLocation(@RequestBody UserLocationDTO userLocationDTO) {

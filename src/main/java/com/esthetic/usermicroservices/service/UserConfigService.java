@@ -3,9 +3,11 @@ package com.esthetic.usermicroservices.service;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.dto.UserLocationDTO;
+import com.esthetic.usermicroservices.dto.UserPlanDTO;
 import com.esthetic.usermicroservices.entity.User;
 import com.esthetic.usermicroservices.entity.UserLocation;
 import com.esthetic.usermicroservices.repository.UserLocationRepository;
+import com.esthetic.usermicroservices.repository.UserPlanRepository;
 import com.esthetic.usermicroservices.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.UUID;
 public class UserConfigService {
     private final UserLocationRepository userLocationRepository;
     private final UserRepository userRepository;
+    private final UserPlanRepository userPlanRepository;
 
     public ResponseDTO _GetLocationByUser(String idUser) {
         Optional<UserLocation> userLocation = userLocationRepository.findByIdUser(idUser);
@@ -47,5 +50,9 @@ public class UserConfigService {
             return ResponseDTO.builder().message("Imagen actualizada con éxito").build();
         }
         return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
+    }
+    public ResponseDTO _GetMyCurrentPlan(String idUser) {
+        Optional<UserPlanDTO> userPlanDTO = userPlanRepository.findByIdUser(idUser);
+        return ResponseDTO.builder().items(userPlanDTO.get()).build();
     }
 }

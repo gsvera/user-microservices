@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,13 +38,14 @@ public class UserService {
     private final ResetTokenService resetTokenService;
     private final CatalogPlanRepository catalogPlanRepository;
     private final UserPlanRepository userPlanRepository;
+    private final PaymentService paymentService;
     @Value("${url.front}")
     public String urlFront;
 
     @Autowired
     private CatalogProfileService catalogProfileService;
 
-    public ResponseDTO SaveUser(UserDTO objUser) throws Exception {
+    public ResponseDTO _SaveUserStheticWork(UserDTO objUser) throws Exception {
         Optional<User> user = Optional.ofNullable(this.FindUserDuplicate(objUser));
 
         if(user.isPresent()) {
@@ -67,17 +69,25 @@ public class UserService {
         newUser.setIdProfile(objUser.getIdProfile());
         userRepository.save(newUser);
 
-//        SE HARDCODEA EL "1" QUE ES EL ID DEL PERFIL PROVEEDOR
-        if(objUser.getIdProfile() > 1) {
-            Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));
-            UserPlan userPlan = new UserPlan(
-                    newUser.getId(),
-                    catalogPlan.get().getId(),
-                    catalogPlan.get().getDuration(),
-                    Timestamp.from(Instant.now())
-            );
-            userPlanRepository.save(userPlan);
-        }
+        Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));
+        LocalDateTime startDate = LocalDateTime.now();
+        LocalDateTime endDate = startDate.plusMonths(catalogPlan.get().getDuration());
+        UserPlan userPlan = new UserPlan(
+                newUser.getId(),
+                catalogPlan.get(),
+                catalogPlan.get().getDuration(),
+                Timestamp.from(Instant.now()),
+                startDate,
+                endDate,
+                true
+        );
+
+        PaymentPlanDTO paymentPlanDTO = objUser.paymentPlanDTO;
+        paymentPlanDTO.idUser = newUser.getId();
+        paymentPlanDTO.paymentDate = LocalDateTime.now();
+        paymentService._CreatePaymentPlan(paymentPlanDTO);
+
+        userPlanRepository.save(userPlan);
 
         String token = jwtService.GetToken(newUser);
 

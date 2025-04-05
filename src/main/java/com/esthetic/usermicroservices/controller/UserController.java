@@ -28,12 +28,12 @@ public class UserController {
         return response;
     }
 
-    @PostMapping("/save")
+    @PostMapping("/save/user-sthetic-work")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO SaveUser(@RequestBody UserDTO userDTO) {
         ResponseDTO response = new ResponseDTO();
         try{
-            return userService.SaveUser(userDTO);
+            return userService._SaveUserStheticWork(userDTO);
         } catch (Exception ex) {
             response.error = true;
             response.message = "Ocurrio un error intentelo mas tarde";
