@@ -21,6 +21,7 @@ public class UserAuthController {
             response.items = userService.GetUserById(id);
         } catch(Exception ex) {
             response.error = true;
+            response.message = "Ocurrio un error intentelo mas tarde";
             System.out.println(ex.getMessage());
         }
         return response;
@@ -32,8 +33,9 @@ public class UserAuthController {
         try{
             response.items = userService.GetUserByToken(token);
         } catch(Exception ex) {
-            response.error = true;
             System.out.print(ex.getMessage());
+            response.error = true;
+            response.message = "Ocurrio un error intentelo mas tarde";
         }
         return response;
     }
@@ -44,22 +46,21 @@ public class UserAuthController {
         try{
             userService.UpdatePersonalInformation(token, userDTO);
         } catch(Exception ex) {
-            response.error = true;
             System.out.println(ex.getMessage());
+            response.error = true;
+            response.message = "Ocurrio un error intentelo mas tarde";
         }
         return response;
     }
     @PutMapping("/update-password-by-user")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO UpdatePasswordByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestParam(name = "new-password") String newPassword) {
-        ResponseDTO response = new ResponseDTO();
         try{
             return userService._UpdatePassword(token, newPassword);
         } catch(Exception ex){
-            response.error = true;
             System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return response;
     }
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
@@ -68,9 +69,19 @@ public class UserAuthController {
         try{
             userService.Logout(token);
         } catch(Exception ex) {
-            response.error = true;
             System.out.println(ex.getMessage());
+            response.error = true;
+            response.message = "Ocurrio un error intentelo mas tarde";
         }
         return response;
+    }
+    @DeleteMapping("/delete-account/{id-user}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO DeleteAccount(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable(name = "id-user") String idUser) {
+        try{
+            return userService._DeleteAccount(idUser, token);
+        } catch (Exception ex) {
+            return  ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
     }
 }

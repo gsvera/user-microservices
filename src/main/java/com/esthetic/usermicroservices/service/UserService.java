@@ -6,12 +6,15 @@ import com.esthetic.usermicroservices.entity.CatalogPlan;
 import com.esthetic.usermicroservices.entity.UserPlan;
 import com.esthetic.usermicroservices.repository.CatalogPlanRepository;
 import com.esthetic.usermicroservices.repository.UserPlanRepository;
+import com.esthetic.usermicroservices.utils.ApiHelper;
 import com.esthetic.usermicroservices.utils.EncrypDecrypCode;
 import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,6 +42,8 @@ public class UserService {
     private final CatalogPlanRepository catalogPlanRepository;
     private final UserPlanRepository userPlanRepository;
     private final PaymentService paymentService;
+    private final ApiHelper apiHelper;
+    private final UserConfigService userConfigService;
     @Value("${url.front}")
     public String urlFront;
 
@@ -294,5 +299,24 @@ public class UserService {
             response.error = true;
         }
         return response;
+    }
+    public ResponseDTO _DeleteAccount(String idUser, String token) {
+        Optional<User> user = userRepository.findById(idUser);
+        if(user.isPresent() && user.get().getToken().equals(token.substring(7))) {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity httpEntity = new HttpEntity<>(headers);
+            headers.set("Authorization", token);
+            String apiUrl = "http://localhost:8002/api/esthetic/delete-user/delete-catalog-account/"+idUser;
+
+            apiHelper._RequestedApi(apiUrl, "DELETE", httpEntity);
+
+            userConfigService._DeleteLocationByUser(idUser);
+            userPlanRepository.deleteAllPlanByUser(idUser);
+            userRepository.deleteUserById(idUser);
+            return ResponseDTO.builder().message("Usuario eliminado completamente").build();
+        }else {
+            return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
+        }
+
     }
 }

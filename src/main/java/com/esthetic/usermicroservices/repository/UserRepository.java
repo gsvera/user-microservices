@@ -30,4 +30,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional @Modifying
     @Query(value = "UPDATE tbl_user SET token = '' WHERE token = ?1", nativeQuery = true)
     int updateToken(String token);
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM tbl_user WHERE id = ?1", nativeQuery = true)
+    void deleteUserById(String id);
 }

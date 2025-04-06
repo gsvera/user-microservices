@@ -55,4 +55,8 @@ public class UserConfigService {
         Optional<UserPlanDTO> userPlanDTO = userPlanRepository.findByIdUser(idUser);
         return ResponseDTO.builder().items(userPlanDTO.get()).build();
     }
+    public ResponseDTO _DeleteLocationByUser(String idUser) {
+        userLocationRepository.deleteByUserId(idUser);
+        return ResponseDTO.builder().message("Registro eliminado").build();
+    }
 }
