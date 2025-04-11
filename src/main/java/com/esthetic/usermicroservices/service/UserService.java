@@ -98,7 +98,7 @@ public class UserService {
 
         userRepository.updateTokenById(newUser.getId(), token);
 
-        ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser.getIdProfile());
+        ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser.getIdProfile(), newUser.getId());
 
         return ResponseDTO.builder().items(response).build();
     }
@@ -165,7 +165,7 @@ public class UserService {
                 String token = jwtService.GetToken(user);
 
                 userRepository.updateTokenById(user.getId(),token);
-                ResponseLoginDTO response = new ResponseLoginDTO(token, user.getIdProfile());
+                ResponseLoginDTO response = new ResponseLoginDTO(token, user.getIdProfile(), user.getId());
 
                 return ResponseDTO.builder().items(response).build();
             } else {
