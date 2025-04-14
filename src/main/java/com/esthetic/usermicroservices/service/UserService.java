@@ -72,6 +72,7 @@ public class UserService {
         newUser.setPhone(objUser.getPhone());
         newUser.setPassword(encodedPassword);
         newUser.setIdProfile(objUser.getIdProfile());
+        newUser.setIsProvider(true);
         userRepository.save(newUser);
 
         Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));
@@ -153,24 +154,33 @@ public class UserService {
     }
 
     public ResponseDTO _Login(LoginRequestDTO loginRequestDTO) throws Exception {
-            User user = userRepository.findByEmail(loginRequestDTO.getUsername()).orElseThrow();
+        Optional<User> user = userRepository.findByEmail(loginRequestDTO.getUsername());
+
+        if(user.isPresent()) {
+            if(loginRequestDTO.getIsProvider()) {
+                if(!user.get().getIsProvider()) {
+                    return ResponseDTO.builder().error(true).message("Acceso denegado, debe adquirir un plan para ingresar como proveedor").build();
+                }
+            }
+
             //      PARA VALIDAR QUE EL PASSWORD SEA EL MISMO
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             String decryptPass = EncrypDecrypCode.passwordDecrypt(loginRequestDTO.password);
 
-            boolean passwordsMatch = encoder.matches(decryptPass, user.getPassword());
+            boolean passwordsMatch = encoder.matches(decryptPass, user.get().getPassword());
 
             if(passwordsMatch) {
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), decryptPass));
-                String token = jwtService.GetToken(user);
+                String token = jwtService.GetToken(user.get());
 
-                userRepository.updateTokenById(user.getId(),token);
-                ResponseLoginDTO response = new ResponseLoginDTO(token, user.getIdProfile(), user.getId());
+                userRepository.updateTokenById(user.get().getId(),token);
+                ResponseLoginDTO response = new ResponseLoginDTO(token, user.get().getIdProfile(), user.get().getId());
 
                 return ResponseDTO.builder().items(response).build();
-            } else {
-                return ResponseDTO.builder().error(true).message("Pass invalid").build();
             }
+        }
+
+        return ResponseDTO.builder().error(true).message("Usuario o contraseña invalido").build();
     }
     public ResponseDTO Logout(String token) {
         System.out.println(token);

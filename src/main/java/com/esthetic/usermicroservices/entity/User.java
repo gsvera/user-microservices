@@ -36,6 +36,10 @@ public class User implements UserDetails {
     private String token;
     @Column(name = "profile_picture_b64")
     private String profilePictureB64;
+    @Column(name = "is_client")
+    private Boolean isClient;
+    @Column(name = "is_provider")
+    private Boolean isProvider;
 
     public User(Optional<User> user){
         this.id = user.get().getId();

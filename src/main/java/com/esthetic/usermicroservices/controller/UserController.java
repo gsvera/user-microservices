@@ -31,27 +31,22 @@ public class UserController {
     @PostMapping("/save/user-sthetic-work")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO SaveUser(@RequestBody UserDTO userDTO) {
-        ResponseDTO response = new ResponseDTO();
         try{
             return userService._SaveUserStheticWork(userDTO);
         } catch (Exception ex) {
-            response.error = true;
-            response.message = "Ocurrio un error intentelo mas tarde";
             System.out.println(ex.getMessage());
+            return  ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return response;
     }
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO LoginUser(@RequestBody LoginRequestDTO userLogin) {
-        ResponseDTO response = new ResponseDTO();
         try{
             return userService._Login(userLogin);
         } catch(Exception ex) {
-            response.error = true;
-            response.message = ex.getMessage();
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return response;
     }
     @PostMapping("/request-reset-password")
     @ResponseStatus(HttpStatus.OK)
