@@ -30,12 +30,22 @@ public class UserController {
 
     @PostMapping("/save/user-sthetic-work")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO SaveUser(@RequestBody UserDTO userDTO) {
+    public ResponseDTO SaveUserWorker(@RequestBody UserDTO userDTO) {
         try{
             return userService._SaveUserStheticWork(userDTO);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return  ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @PostMapping("/save/user-sthetic-client")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO SaveUserClient(@RequestBody UserDTO userDTO) {
+        try{
+            return userService._SaveUserStheticClient(userDTO);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
     @PostMapping("/login")

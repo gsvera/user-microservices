@@ -103,6 +103,39 @@ public class UserService {
 
         return ResponseDTO.builder().items(response).build();
     }
+    public ResponseDTO _SaveUserStheticClient(UserDTO userDTO) throws Exception {
+        Optional<User> user = Optional.ofNullable(this.FindUserDuplicate(userDTO));
+
+        if(user.isPresent()) {
+            return ResponseDTO.builder().message("Ya existe un usuario con esos datos").error(true).build();
+        }
+
+        UUID uuid = UUID.randomUUID();
+        String decryptPass = EncrypDecrypCode.passwordDecrypt(userDTO.getPassword());
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode(decryptPass);
+
+        User newUser = new User();
+        newUser.setId(uuid.toString());
+        newUser.setFirstName(userDTO.getFirstName());
+        newUser.setLastName(userDTO.getLastName());
+        newUser.setEmail(userDTO.getEmail());
+//        newUser.setBirthDate(objUser.getBirthDate());
+        newUser.setLada(userDTO.getLada());
+        newUser.setPhone(userDTO.getPhone());
+        newUser.setPassword(encodedPassword);
+//        newUser.setIdProfile(objUser.getIdProfile());
+        newUser.setIsClient(true);
+        userRepository.save(newUser);
+
+        String token = jwtService.GetToken(newUser);
+
+        userRepository.updateTokenById(newUser.getId(), token);
+
+        ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser.getIdProfile(), newUser.getId());
+
+        return ResponseDTO.builder().items(response).build();
+    }
     public ResponseDTO UpdatePersonalInformation(String token, UserDTO objUser) {
         Optional<User> user = userRepository.findByToken(token.substring(7));
 
@@ -157,7 +190,7 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(loginRequestDTO.getUsername());
 
         if(user.isPresent()) {
-            if(loginRequestDTO.getIsProvider()) {
+            if(loginRequestDTO.getIsProvider() != null && loginRequestDTO.getIsProvider()) {
                 if(!user.get().getIsProvider()) {
                     return ResponseDTO.builder().error(true).message("Acceso denegado, debe adquirir un plan para ingresar como proveedor").build();
                 }
@@ -212,13 +245,10 @@ public class UserService {
     }
 
     public UserDTO GetUserByToken (String token) {
+        System.out.println(token);
         Optional<User> user = userRepository.findByToken(token.substring(7));
 
         UserDTO userDto = new UserDTO(user);
-
-        if(userDto.getId() != null) {
-            userDto.setCatalogProfileDTO(catalogProfileService.getById(userDto.getIdProfile()));
-        }
 
         return userDto;
     }
