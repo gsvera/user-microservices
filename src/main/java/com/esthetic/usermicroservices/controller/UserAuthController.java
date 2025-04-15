@@ -84,4 +84,13 @@ public class UserAuthController {
             return  ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
+    @DeleteMapping("/delete-client-account/{id-user}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO DeleteClientAccount(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable(name = "id-user") String idUser) {
+        try{
+            return userService._DeleteClientAccount(idUser, token);
+        } catch (Exception ex) {
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
 }

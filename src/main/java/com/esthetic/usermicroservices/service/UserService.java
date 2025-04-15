@@ -73,6 +73,7 @@ public class UserService {
         newUser.setPassword(encodedPassword);
         newUser.setIdProfile(objUser.getIdProfile());
         newUser.setIsProvider(true);
+        newUser.setIsClient(true);
         userRepository.save(newUser);
 
         Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));
@@ -193,6 +194,11 @@ public class UserService {
             if(loginRequestDTO.getIsProvider() != null && loginRequestDTO.getIsProvider()) {
                 if(!user.get().getIsProvider()) {
                     return ResponseDTO.builder().error(true).message("Acceso denegado, debe adquirir un plan para ingresar como proveedor").build();
+                }
+            }
+            if(loginRequestDTO.getIsClient() != null && loginRequestDTO.getIsClient()) {
+                if(!user.get().getIsClient()) {
+                    return ResponseDTO.builder().error(true).message("Acceso denegado, no tiene privilegios para ingresar a la aplicación").build();
                 }
             }
 
@@ -354,9 +360,20 @@ public class UserService {
             userPlanRepository.deleteAllPlanByUser(idUser);
             userRepository.deleteUserById(idUser);
             return ResponseDTO.builder().message("Usuario eliminado completamente").build();
-        }else {
-            return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
         }
+        return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
 
+    }
+    public ResponseDTO _DeleteClientAccount(String idUser, String token) {
+        Optional<User> user = userRepository.findById(idUser);
+        if(user.isPresent() && user.get().getToken().equals(token.substring(7))) {
+            if(user.get().getIsProvider()) {
+                userRepository.removeIsClient(idUser);
+                return ResponseDTO.builder().message("Se removio el acceso a cliente").build();
+            }
+            userRepository.deleteUserById(idUser);
+            return ResponseDTO.builder().message("Usuario eliminado completamente").build();
+        }
+        return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
     }
 }

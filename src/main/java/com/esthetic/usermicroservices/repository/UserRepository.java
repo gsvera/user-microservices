@@ -34,4 +34,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query(value = "DELETE FROM tbl_user WHERE id = ?1", nativeQuery = true)
     void deleteUserById(String id);
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE User u SET u.isClient = false WHERE id = ?1")
+    void removeIsClient(String id);
 }
