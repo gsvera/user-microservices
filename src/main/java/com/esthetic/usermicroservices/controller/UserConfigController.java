@@ -1,10 +1,12 @@
 package com.esthetic.usermicroservices.controller;
 
+import com.esthetic.usermicroservices.dto.InfoCompanyDTO;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.dto.UserLocationDTO;
 import com.esthetic.usermicroservices.service.UserConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -50,6 +52,26 @@ public class UserConfigController
         }catch(Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message(ex.getMessage()).build();
+        }
+    }
+    @GetMapping("/get-info-company-by-user/{id-user}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO GetInfoCompanyByUser(@PathVariable("id-user") String idUser) {
+        try{
+            return userConfigService._GetInforCompanyByUser(idUser);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @PutMapping("/update-info-company")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO SaveInfoCompany(@RequestBody InfoCompanyDTO infoCompanyDTO) {
+        try{
+            return userConfigService._UpdateInfoCompany(infoCompanyDTO);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
 }

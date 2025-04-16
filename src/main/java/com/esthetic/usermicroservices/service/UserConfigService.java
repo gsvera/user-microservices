@@ -1,11 +1,10 @@
 package com.esthetic.usermicroservices.service;
 
-import com.esthetic.usermicroservices.dto.ResponseDTO;
-import com.esthetic.usermicroservices.dto.UserDTO;
-import com.esthetic.usermicroservices.dto.UserLocationDTO;
-import com.esthetic.usermicroservices.dto.UserPlanDTO;
+import com.esthetic.usermicroservices.dto.*;
+import com.esthetic.usermicroservices.entity.InfoCompany;
 import com.esthetic.usermicroservices.entity.User;
 import com.esthetic.usermicroservices.entity.UserLocation;
+import com.esthetic.usermicroservices.repository.InfoCompanyRepository;
 import com.esthetic.usermicroservices.repository.UserLocationRepository;
 import com.esthetic.usermicroservices.repository.UserPlanRepository;
 import com.esthetic.usermicroservices.repository.UserRepository;
@@ -21,7 +20,7 @@ public class UserConfigService {
     private final UserLocationRepository userLocationRepository;
     private final UserRepository userRepository;
     private final UserPlanRepository userPlanRepository;
-
+    private final InfoCompanyRepository infoCompanyRepository;
     public ResponseDTO _GetLocationByUser(String idUser) {
         Optional<UserLocation> userLocation = userLocationRepository.findByIdUser(idUser);
         if(userLocation.isPresent()) {
@@ -58,5 +57,24 @@ public class UserConfigService {
     public ResponseDTO _DeleteLocationByUser(String idUser) {
         userLocationRepository.deleteByUserId(idUser);
         return ResponseDTO.builder().message("Registro eliminado").build();
+    }
+    public ResponseDTO _GetInforCompanyByUser(String idUser) {
+        Optional<InfoCompany> infoCompany = infoCompanyRepository.findByIdUser(idUser);
+        return ResponseDTO.builder().items(new InfoCompanyDTO(infoCompany.get())).build();
+    }
+    public ResponseDTO _UpdateInfoCompany(InfoCompanyDTO infoCompanyDTO) {
+        Optional<InfoCompany> infoCompany = infoCompanyRepository.findByIdUser(infoCompanyDTO.idUser);
+        if(infoCompany.isPresent()) {
+            infoCompany.orElseThrow().setGeneralDescription(infoCompanyDTO.generalDescription);
+            infoCompany.orElseThrow().setCompanyName(infoCompanyDTO.companyName);
+            infoCompany.orElseThrow().setCompanyPicture(infoCompanyDTO.companyPicture);
+            infoCompany.orElseThrow().setFacebook(infoCompanyDTO.facebook);
+            infoCompany.orElseThrow().setInstagram(infoCompanyDTO.instagram);
+            infoCompany.orElseThrow().setWebPage(infoCompanyDTO.webPage);
+            infoCompanyRepository.save(infoCompany.get());
+        } else {
+            infoCompanyRepository.save(new InfoCompany(infoCompanyDTO));
+        }
+        return ResponseDTO.builder().message("Información de negocio guardado con éxito").build();
     }
 }

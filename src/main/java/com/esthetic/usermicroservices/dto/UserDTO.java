@@ -25,6 +25,7 @@ public class UserDTO {
     public int planSelect;
     public CatalogProfileDTO catalogProfileDTO = null;
     public PaymentPlanDTO paymentPlanDTO;
+    public String typeServices;
     public UserDTO(Optional<User> user){
         this.id = user.get().getId();
         this.firstName = user.get().getFirstName();

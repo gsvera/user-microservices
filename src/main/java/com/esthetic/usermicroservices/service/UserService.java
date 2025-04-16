@@ -23,8 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import com.esthetic.usermicroservices.repository.UserRepository;
 import com.esthetic.usermicroservices.entity.User;

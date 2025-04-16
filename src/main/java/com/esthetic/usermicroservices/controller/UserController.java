@@ -4,6 +4,7 @@ import com.esthetic.usermicroservices.clases.RequestTokenReset;
 import com.esthetic.usermicroservices.dto.LoginRequestDTO;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
+import com.esthetic.usermicroservices.service.InfoCompanyService;
 import com.esthetic.usermicroservices.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private InfoCompanyService infoCompanyService;
 
     @GetMapping("/find-duplicated-user")
     @ResponseStatus(HttpStatus.OK)
@@ -81,5 +84,15 @@ public class UserController {
             System.out.println(ex.getMessage());
         }
         return response;
+    }
+    @GetMapping("/get-provider-available")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO GetProviderAvailable(@RequestParam(defaultValue = "0")int page, @RequestParam(defaultValue = "10") int size, @RequestParam(name = "type-service", required = false) String typeService) {
+        try{
+            return infoCompanyService._GetProviderAvailable(page, size, typeService);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
     }
 }
