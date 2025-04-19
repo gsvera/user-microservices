@@ -1,6 +1,7 @@
 package com.esthetic.usermicroservices.service;
 
 import com.esthetic.usermicroservices.dto.InfoCompanyDTO;
+import com.esthetic.usermicroservices.dto.PageDTO;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.repository.InfoCompanyRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,16 +17,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InfoCompanyService {
     private final InfoCompanyRepository infoCompanyRepository;
-    public ResponseDTO _GetProviderAvailable(int page, int size, String typeService) {
+    public ResponseDTO _GetProviderAvailable(int page, int size, String typeService, String word) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        System.out.println(typeService);
         Page<Object[]> listProvider = null;
         if(typeService != null && !typeService.isEmpty()){
-            List<String> arrTypeService = Arrays.stream(typeService.split(",")).toList();
+            Integer[] arrayTypeService = Arrays.stream(typeService.split(","))
+                    .map(Integer::parseInt)
+                    .toArray(Integer[]::new);
 
-            listProvider = infoCompanyRepository.getProviderByTypeServices(arrTypeService, pageRequest);
+            listProvider = infoCompanyRepository.getProviderByTypeServices(word, arrayTypeService, pageRequest);
         } else {
-            listProvider = infoCompanyRepository.getProvider(pageRequest);
+            listProvider = infoCompanyRepository.getProvider(word, pageRequest);
         }
         List<InfoCompanyDTO> listUserDto = new ArrayList<>();
         for(Object[] item : listProvider){
@@ -38,7 +40,9 @@ public class InfoCompanyService {
             infoCompanyDTO.typesServices = (String) item[5];
             listUserDto.add(infoCompanyDTO);
         }
+        PageDTO pageDTO = new PageDTO(listProvider);
+        pageDTO.items = listUserDto;
 
-        return ResponseDTO.builder().items(listUserDto).build();
+        return ResponseDTO.builder().items(pageDTO).build();
     }
 }

@@ -87,9 +87,14 @@ public class UserController {
     }
     @GetMapping("/get-provider-available")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO GetProviderAvailable(@RequestParam(defaultValue = "0")int page, @RequestParam(defaultValue = "10") int size, @RequestParam(name = "type-service", required = false) String typeService) {
+    public ResponseDTO GetProviderAvailable(
+            @RequestParam(defaultValue = "0")int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(name = "type-service", required = false) String typeService,
+            @RequestParam(required = false, defaultValue = "") String word
+    ) {
         try{
-            return infoCompanyService._GetProviderAvailable(page, size, typeService);
+            return infoCompanyService._GetProviderAvailable(page, size, typeService, word);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
