@@ -100,4 +100,13 @@ public class UserController {
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
+    @GetMapping("/get-provider-by-id/{id-user}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO GetProviderById(@PathVariable(name = "id-user") String idUser) {
+        try {
+            return  infoCompanyService._GetProvidedrById(idUser);
+        } catch (Exception ex) {
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
 }

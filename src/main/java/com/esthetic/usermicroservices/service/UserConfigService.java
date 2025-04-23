@@ -32,11 +32,12 @@ public class UserConfigService {
     public ResponseDTO _SaveUserLocation(UserLocationDTO userLocationDTO) {
         Optional<UserLocation> userLocation = userLocationRepository.findByIdUser(userLocationDTO.getIdUser());
         if(userLocation.isPresent()) {
-            UserLocation newLocation = new UserLocation(userLocation.get().getId(),userLocation.get().getIdUser(), userLocationDTO.getLatitude(), userLocationDTO.getLongitude());
+            UserLocation newLocation = new UserLocation(userLocation.get().getId(),userLocation.get().getUser().getId(), userLocationDTO.getLatitude(), userLocationDTO.getLongitude());
             userLocationRepository.save(newLocation);
         } else {
             UUID uuid = UUID.randomUUID();
             userLocationDTO.setId(uuid.toString());
+            userLocationDTO.userDTO = new UserDTO(new User(userLocationDTO.idUser));
             userLocationRepository.save(new UserLocation(userLocationDTO)).getId();
         }
         return ResponseDTO.builder().error(false).message("Se ha guardado la ubicación con éxito").build();
@@ -73,6 +74,7 @@ public class UserConfigService {
             infoCompany.orElseThrow().setWebPage(infoCompanyDTO.webPage);
             infoCompanyRepository.save(infoCompany.get());
         } else {
+            infoCompanyDTO.userDTO = new UserDTO(new User(infoCompanyDTO.idUser));
             infoCompanyRepository.save(new InfoCompany(infoCompanyDTO));
         }
         return ResponseDTO.builder().message("Información de negocio guardado con éxito").build();

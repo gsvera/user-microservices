@@ -73,6 +73,7 @@ public class UserService {
         newUser.setIdProfile(objUser.getIdProfile());
         newUser.setIsProvider(true);
         newUser.setIsClient(true);
+        newUser.setActiveProvider(true);
         userRepository.save(newUser);
 
         Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));

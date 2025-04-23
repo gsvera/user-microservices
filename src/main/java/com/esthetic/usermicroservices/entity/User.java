@@ -1,6 +1,7 @@
 package com.esthetic.usermicroservices.entity;
 
 import com.esthetic.usermicroservices.dto.UserDTO;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -40,6 +41,14 @@ public class User implements UserDetails {
     private Boolean isClient;
     @Column(name = "is_provider")
     private Boolean isProvider;
+    @Column(name = "active_provider")
+    private Boolean activeProvider;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private InfoCompany userInfoCompany;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private UserLocation userLocation;
 
     public User(Optional<User> user){
         this.id = user.get().getId();
@@ -52,6 +61,12 @@ public class User implements UserDetails {
         this.password = user.get().getPassword();
         this.idProfile = user.get().getIdProfile();
         this.token = user.get().getToken();
+    }
+    public User(UserDTO userDTO) {
+        this.id = userDTO.getId();
+    }
+    public User(String idUser) {
+        this.id = idUser;
     }
 
     @Override

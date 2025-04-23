@@ -10,14 +10,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserLocationDTO {
     private String id;
-    private String idUser;
+    public UserDTO userDTO;
     private double latitude;
     private double longitude;
+    public String idUser; // aux
 
     public UserLocationDTO(UserLocation userLocation) {
         this.id = userLocation.getId();
-        this.idUser = userLocation.getIdUser();
+        this.userDTO = new UserDTO(userLocation.getUser());
         this.latitude = userLocation.getLatitude();
         this.longitude = userLocation.getLongitude();
+    }
+    public UserLocationDTO(UserLocation userLocation, Boolean includeUser) {
+        this.id = userLocation.getId();
+        this.latitude = userLocation.getLatitude();
+        this.longitude = userLocation.getLongitude();
+        if(!includeUser) {
+            this.userDTO = new UserDTO(userLocation.getUser());
+        }
     }
 }

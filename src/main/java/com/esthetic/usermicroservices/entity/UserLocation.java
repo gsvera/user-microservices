@@ -1,10 +1,8 @@
 package com.esthetic.usermicroservices.entity;
 
 import com.esthetic.usermicroservices.dto.UserLocationDTO;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,19 +13,21 @@ import lombok.NoArgsConstructor;
 public class UserLocation {
     @Id
     private String id;
-    @Column(name = "id_user")
-    private String idUser;
+    @OneToOne
+    @JoinColumn(name = "id_user", insertable = true, updatable = true, nullable = false)
+    @JsonBackReference
+    private User user;
     private double latitude;
     private double longitude;
     public UserLocation(UserLocationDTO userLocationDTO) {
         this.id = userLocationDTO.getId();
-        this.idUser = userLocationDTO.getIdUser();
+        this.user = new User(userLocationDTO.getUserDTO());
         this.latitude = userLocationDTO.getLatitude();
         this.longitude = userLocationDTO.getLongitude();
     }
     public UserLocation(String id, String idUser, double latitude, double longitude) {
         this.id = id;
-        this.idUser = idUser;
+        this.user = new User(idUser);
         this.latitude = latitude;
         this.longitude = longitude;
     }

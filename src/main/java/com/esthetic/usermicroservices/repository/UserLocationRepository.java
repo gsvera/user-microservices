@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 public interface UserLocationRepository extends JpaRepository<UserLocation, Long> {
+    @Query(value = "SELECT * FROM tbl_user_location WHERE id_user = ?1", nativeQuery = true)
     Optional<UserLocation> findByIdUser(String idUser);
     @Modifying
     @Transactional

@@ -37,4 +37,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query(value = "UPDATE User u SET u.isClient = false WHERE id = ?1")
     void removeIsClient(String id);
+    @Query(value = "SELECT u FROM User u LEFT JOIN FETCH u.userInfoCompany LEFT JOIN FETCH u.userLocation WHERE u.id = ?1")
+    Optional<User> findUserProviderWithDetails(String idUser);
 }
