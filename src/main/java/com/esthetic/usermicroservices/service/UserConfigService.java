@@ -24,7 +24,9 @@ public class UserConfigService {
     public ResponseDTO _GetLocationByUser(String idUser) {
         Optional<UserLocation> userLocation = userLocationRepository.findByIdUser(idUser);
         if(userLocation.isPresent()) {
-            return ResponseDTO.builder().error(false).items(new UserLocationDTO(userLocation.get())).build();
+            return ResponseDTO.builder().error(false).items(
+                    new UserLocationDTO()._GetInfoLocation(userLocation.get())
+            ).build();
         } else {
             return ResponseDTO.builder().error(true).message("No se encontro una ubicación guardada").build();
         }
@@ -32,8 +34,13 @@ public class UserConfigService {
     public ResponseDTO _SaveUserLocation(UserLocationDTO userLocationDTO) {
         Optional<UserLocation> userLocation = userLocationRepository.findByIdUser(userLocationDTO.getIdUser());
         if(userLocation.isPresent()) {
-            UserLocation newLocation = new UserLocation(userLocation.get().getId(),userLocation.get().getUser().getId(), userLocationDTO.getLatitude(), userLocationDTO.getLongitude());
-            userLocationRepository.save(newLocation);
+            userLocation.orElseThrow().setLatitude(userLocationDTO.getLatitude());
+            userLocation.orElseThrow().setLongitude(userLocationDTO.getLongitude());
+            userLocation.orElseThrow().setIdState(userLocationDTO.idState);
+            userLocation.orElseThrow().setIdMunicipality(userLocationDTO.idMunicipality);
+            userLocation.orElseThrow().setAuxState(userLocationDTO.auxState);
+            userLocation.orElseThrow().setAuxMunicipality(userLocationDTO.auxMunicipality);
+            userLocationRepository.save(userLocation.get());
         } else {
             UUID uuid = UUID.randomUUID();
             userLocationDTO.setId(uuid.toString());

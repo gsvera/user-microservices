@@ -222,7 +222,6 @@ public class UserService {
         return ResponseDTO.builder().error(true).message("Usuario o contraseña invalido").build();
     }
     public ResponseDTO Logout(String token) {
-        System.out.println(token);
         int updatedRows = userRepository.updateToken(token.substring(7));
         if(updatedRows == 0) {
             return ResponseDTO.builder().error(true).message("No se encontro el usuairo").build();
