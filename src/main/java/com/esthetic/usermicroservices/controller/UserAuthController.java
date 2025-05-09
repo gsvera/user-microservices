@@ -90,6 +90,7 @@ public class UserAuthController {
         try{
             return userService._DeleteClientAccount(idUser, token);
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }

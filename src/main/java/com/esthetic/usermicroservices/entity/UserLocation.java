@@ -27,6 +27,7 @@ public class UserLocation {
     private String auxState;
     @Column(name = "aux_municipality")
     private String auxMunicipality;
+    private String reference;
     public UserLocation(UserLocationDTO userLocationDTO) {
         this.id = userLocationDTO.getId();
         this.user = new User(userLocationDTO.getUserDTO());
@@ -36,6 +37,7 @@ public class UserLocation {
         this.idMunicipality = userLocationDTO.idMunicipality;
         this.auxState = userLocationDTO.auxState;
         this.auxMunicipality = userLocationDTO.auxMunicipality;
+        this.reference = userLocationDTO.reference;
     }
     public UserLocation(String id, String idUser, double latitude, double longitude) {
         this.id = id;

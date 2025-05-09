@@ -366,7 +366,7 @@ public class UserService {
     public ResponseDTO _DeleteClientAccount(String idUser, String token) {
         Optional<User> user = userRepository.findById(idUser);
         if(user.isPresent() && user.get().getToken().equals(token.substring(7))) {
-            if(user.get().getIsProvider()) {
+            if(user.get().getIsProvider() != null && user.get().getIsProvider()) {
                 userRepository.removeIsClient(idUser);
                 return ResponseDTO.builder().message("Se removio el acceso a cliente").build();
             }

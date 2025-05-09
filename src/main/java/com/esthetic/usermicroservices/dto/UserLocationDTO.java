@@ -18,6 +18,7 @@ public class UserLocationDTO {
     public Long idMunicipality;
     public String auxState;
     public String auxMunicipality;
+    public String reference;
 
     public UserLocationDTO(UserLocation userLocation) {
         this.id = userLocation.getId();
@@ -43,6 +44,7 @@ public class UserLocationDTO {
         this.idMunicipality = userLocation.getIdMunicipality();
         this.auxState = userLocation.getAuxState();
         this.auxMunicipality = userLocation.getAuxMunicipality();
+        this.reference = userLocation.getReference();
         return this;
     }
 }

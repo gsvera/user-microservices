@@ -40,6 +40,7 @@ public class UserConfigService {
             userLocation.orElseThrow().setIdMunicipality(userLocationDTO.idMunicipality);
             userLocation.orElseThrow().setAuxState(userLocationDTO.auxState);
             userLocation.orElseThrow().setAuxMunicipality(userLocationDTO.auxMunicipality);
+            userLocation.orElseThrow().setReference(userLocationDTO.reference);
             userLocationRepository.save(userLocation.get());
         } else {
             UUID uuid = UUID.randomUUID();
