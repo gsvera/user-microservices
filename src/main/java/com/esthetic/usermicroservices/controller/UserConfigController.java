@@ -15,7 +15,7 @@ public class UserConfigController
 {
     @Autowired
     private UserConfigService userConfigService;
-    @GetMapping("/get-location-by-user")
+    @GetMapping("/get-location-by-provider")
     public ResponseDTO getLocationByUser(@RequestParam(name = "id-user") String idUser) {
         try{
             return userConfigService._GetLocationByUser(idUser);

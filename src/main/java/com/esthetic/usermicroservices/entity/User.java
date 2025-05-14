@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 
+// SI MODIFICA ALGUN ATRIBUTO DE ESTA ENTITY VALIDAR EN OTROS MICROS QUE EL CAMBIO SEA EL MISMO ENESPECIFICO LOS
+// ATRIBUTOS QUE SE NECESITAN (services-microservices)
 @Entity
 @Data
 @ToString
@@ -19,7 +21,6 @@ import java.util.Optional;
 @AllArgsConstructor
 @Table(name = "tbl_user")
 public class User implements UserDetails {
-
     @Id
     private String id;
     @Column(name = "first_name")
