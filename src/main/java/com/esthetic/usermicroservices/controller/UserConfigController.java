@@ -24,6 +24,15 @@ public class UserConfigController
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
+    @GetMapping("/get-default-location-by-client/{id-user}")
+    public ResponseDTO GetDefaultLocationByClient(@PathVariable(name = "id-user") String idUser) {
+        try{
+            return userConfigService._GetDefaultLocationByUser(idUser);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
     @GetMapping("/get-my-current-plan/{id-user}")
     public ResponseDTO GetMyCurrentPlan(@PathVariable("id-user") String idUser) {
         try{
@@ -35,15 +44,27 @@ public class UserConfigController
     }
     @PostMapping("/save-location")
     public ResponseDTO saveLocation(@RequestBody UserLocationDTO userLocationDTO) {
-        ResponseDTO response = new ResponseDTO();
         try{
             return userConfigService._SaveUserLocation(userLocationDTO);
         } catch(Exception ex) {
-            response.error = true;
-            response.message = "Ocurrio un error intentelo mas tarde";
             System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return response;
+    }
+    @PutMapping("/save-default-location-client/{id-user}")
+    public ResponseDTO SaveDefaultLocationClient(
+            @PathVariable(name = "id-user") String idUser,
+            @RequestParam(name = "default-state") String defaultState,
+            @RequestParam(name = "default-municipality", required = false) String defaultMunicipality
+    ) {
+        try {
+            System.out.println("primero");
+            System.out.println(defaultMunicipality);
+            return userConfigService._SaveDefaultLocationClient(idUser,defaultState, defaultMunicipality);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
     }
     @PutMapping("/save-profile-picture")
     public ResponseDTO saveProfilePicture(@RequestBody UserDTO userDTO) {

@@ -44,6 +44,10 @@ public class User implements UserDetails {
     private Boolean isProvider;
     @Column(name = "active_provider")
     private Boolean activeProvider;
+    @Column(name = "default_state")
+    private String defaultState;
+    @Column(name = "default_municipality")
+    private String defaultMunicipality;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
     private InfoCompany userInfoCompany;

@@ -11,6 +11,8 @@ import com.esthetic.usermicroservices.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +32,26 @@ public class UserConfigService {
         } else {
             return ResponseDTO.builder().error(true).message("No se encontro una ubicación guardada").build();
         }
+    }
+    public ResponseDTO _GetDefaultLocationByUser(String idUser) {
+        Optional<User> user = userRepository.findById(idUser);
+        if(user.isPresent()) {
+            Map<String, String> userLocationDefault = new HashMap<>();
+            userLocationDefault.put("defaultState", user.get().getDefaultState());
+            userLocationDefault.put("defaultMunicipality", user.get().getDefaultMunicipality());
+            return ResponseDTO.builder().items(userLocationDefault).build();
+        }
+        return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
+    }
+    public ResponseDTO _SaveDefaultLocationClient(String idUser, String defaultState, String defaultMunicipality) {
+        Optional<User> user = userRepository.findById(idUser);
+        if(user.isPresent()) {
+            user.orElseThrow().setDefaultState(defaultState);
+            user.orElseThrow().setDefaultMunicipality(defaultMunicipality);
+            userRepository.save(user.get());
+            return ResponseDTO.builder().message("Ubicacion pretederminada guardada con éxito").build();
+        }
+        return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
     }
     public ResponseDTO _SaveUserLocation(UserLocationDTO userLocationDTO) {
         Optional<UserLocation> userLocation = userLocationRepository.findByIdUser(userLocationDTO.getIdUser());
