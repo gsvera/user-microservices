@@ -18,44 +18,57 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
             "ic.company_name, \n" +
             "ic.general_description, \n" +
             "ic.company_picture, \n" +
-            "STRING_AGG(ts.type_service_name_es, ',') \n" +
+            "STRING_AGG(ts.type_service_name_es, ','), \n" +
+            "ul.aux_state, \n" +
+            "ul.aux_municipality \n" +
             "FROM tbl_user AS u \n" +
             "JOIN tbl_type_service_x_user AS tsu ON tsu.id_user = u.id \n" +
             "JOIN tbl_catalog_type_service AS ts ON tsu.id_type_service = ts.id \n" +
             "JOIN tbl_info_company AS ic ON ic.id_user = u.id \n" +
-            "WHERE u.is_provider = true AND u.active_provider = true AND (?1 IS NULL OR ic.company_name ILIKE %?1%) AND EXISTS (\n" +
-            "      SELECT 1 \n" +
+            "JOIN tbl_user_location AS ul ON u.id = ul.id_user \n" +
+            "WHERE u.is_provider = true AND u.active_provider = true AND (?1 IS NULL OR ?1 = '' OR ic.company_name ILIKE %?1%) \n" +
+            "AND (?2 IS NULL OR ?2 = '' OR ul.aux_state ILIKE %?2%) \n" +
+            "AND (?3 IS NULL OR ?3 = '' OR ul.aux_municipality ILIKE %?3%) \n" +
+            "      AND EXISTS (SELECT 1 \n" +
             "      FROM tbl_type_service_x_user tsu2 \n" +
             "      WHERE tsu2.id_user = u.id \n" +
             "  )\n" +
-            "GROUP BY u.id, ic.id;", nativeQuery = true)
-    Page<Object[]> getProvider(String word, Pageable pageable);
+            "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality;", nativeQuery = true)
+    Page<Object[]> getProvider(String word, String defaultState, String defaultMunicipality, Pageable pageable);
 
 @Query(value = "SELECT DISTINCT(u.id), ic.id, ic.company_name, ic.general_description, ic.company_picture, " +
-        "STRING_AGG(ts.type_service_name_es, ',') " +
+        "STRING_AGG(ts.type_service_name_es, ','), " +
+        "ul.aux_state, " +
+        "ul.aux_municipality " +
         "FROM tbl_user AS u " +
         "JOIN tbl_type_service_x_user AS tsu ON tsu.id_user = u.id " +
         "JOIN tbl_catalog_type_service AS ts ON tsu.id_type_service = ts.id " +
         "JOIN tbl_info_company AS ic ON ic.id_user = u.id " +
+        "JOIN tbl_user_location AS ul ON u.id = ul.id_user " +
         "WHERE u.is_provider = true AND u.active_provider = true " +
-        "AND (:word IS NULL OR ic.company_name ILIKE %:word%) " +
+        "AND (:word IS NULL OR :word = '' OR ic.company_name ILIKE %:word%) " +
+        "AND (:defaultState IS NULL OR :defaultState = '' OR ul.aux_state ILIKE %:defaultState%) " +
+        "AND (:defaultMunicipality IS NULL OR :defaultMunicipality = '' OR ul.aux_municipality ILIKE %:defaultMunicipality%) " +
         "AND (:types IS NULL OR EXISTS (" +
         "    SELECT 1 FROM tbl_type_service_x_user tsu2 " +
         "    WHERE tsu2.id_user = u.id " +
         "    AND tsu2.id_type_service = ANY(CAST(:types AS int[]))" +
         ")) " +
-        "GROUP BY u.id, ic.id",
+        "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality ",
         countQuery = "SELECT COUNT(*) FROM tbl_user AS u " +
                 "JOIN tbl_type_service_x_user AS tsu ON tsu.id_user = u.id " +
                 "JOIN tbl_catalog_type_service AS ts ON tsu.id_type_service = ts.id " +
                 "JOIN tbl_info_company AS ic ON ic.id_user = u.id " +
+                "JOIN tbl_user_location AS ul ON u.id = ul.id_user " +
                 "WHERE u.is_provider = true AND u.active_provider = true " +
-                "AND (:word IS NULL OR ic.company_name ILIKE %:word%) " +
+                "AND (:word IS NULL OR :word = '' OR ic.company_name ILIKE %:word%) " +
+                "AND (:defaultState IS NULL OR :defaultState = '' OR ul.aux_state ILIKE %:defaultState%) " +
+                "AND (:defaultMunicipality IS NULL OR :defaultMunicipality = '' OR ul.aux_municipality ILIKE %:defaultMunicipality%) " +
                 "AND (:types IS NULL OR EXISTS (" +
                 "    SELECT 1 FROM tbl_type_service_x_user tsu2 " +
                 "    WHERE tsu2.id_user = u.id " +
                 "    AND tsu2.id_type_service = ANY(CAST(:types AS int[]))" +
                 "))",
         nativeQuery = true)
-Page<Object[]> getProviderByTypeServices(@Param("word") String word, @Param("types") Integer[] typeService, Pageable pageable);
+Page<Object[]> getProviderByTypeServices(@Param("word") String word, @Param("defaultState") String defaultState, @Param("defaultMunicipality") String defaultMunicipality, @Param("types") Integer[] typeService, Pageable pageable);
 }

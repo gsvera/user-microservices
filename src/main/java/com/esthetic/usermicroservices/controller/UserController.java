@@ -90,11 +90,13 @@ public class UserController {
     public ResponseDTO GetProviderAvailable(
             @RequestParam(defaultValue = "0")int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(name = "type-service", required = false) String typeService,
-            @RequestParam(required = false, defaultValue = "") String word
-    ) {
+            @RequestParam(required = false) String typeService,
+            @RequestParam(required = false, defaultValue = "") String word,
+            @RequestParam(required = false, defaultValue = "") String defaultState,
+            @RequestParam(required = false, defaultValue = "") String defaultMunicipality
+            ) {
         try{
-            return infoCompanyService._GetProviderAvailable(page, size, typeService, word);
+            return infoCompanyService._GetProviderAvailable(page, size, typeService, word, defaultState, defaultMunicipality);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();

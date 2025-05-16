@@ -1,9 +1,6 @@
 package com.esthetic.usermicroservices.service;
 
-import com.esthetic.usermicroservices.dto.InfoCompanyDTO;
-import com.esthetic.usermicroservices.dto.PageDTO;
-import com.esthetic.usermicroservices.dto.ResponseDTO;
-import com.esthetic.usermicroservices.dto.UserDTO;
+import com.esthetic.usermicroservices.dto.*;
 import com.esthetic.usermicroservices.entity.User;
 import com.esthetic.usermicroservices.repository.InfoCompanyRepository;
 import com.esthetic.usermicroservices.repository.UserRepository;
@@ -24,7 +21,7 @@ public class InfoCompanyService {
     private final InfoCompanyRepository infoCompanyRepository;
     private final UserRepository userRepository;
     private final ApiHelper apiHelper;
-    public ResponseDTO _GetProviderAvailable(int page, int size, String typeService, String word) {
+    public ResponseDTO _GetProviderAvailable(int page, int size, String typeService, String word, String defaultState, String defaultMunicipality) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Object[]> listProvider = null;
         if(typeService != null && !typeService.isEmpty()){
@@ -32,9 +29,9 @@ public class InfoCompanyService {
                     .map(Integer::parseInt)
                     .toArray(Integer[]::new);
 
-            listProvider = infoCompanyRepository.getProviderByTypeServices(word, arrayTypeService, pageRequest);
+            listProvider = infoCompanyRepository.getProviderByTypeServices(word, defaultState, defaultMunicipality, arrayTypeService, pageRequest);
         } else {
-            listProvider = infoCompanyRepository.getProvider(word, pageRequest);
+            listProvider = infoCompanyRepository.getProvider(word, defaultState, defaultMunicipality, pageRequest);
         }
         List<InfoCompanyDTO> listUserDto = new ArrayList<>();
         for(Object[] item : listProvider){
