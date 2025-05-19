@@ -13,6 +13,8 @@ public class InfoCompanyDTO {
     public String webPage;
     public String idUser; // parametro auxiliar
     public String typesServices; // Parametro de auxiliar
+    public String auxState;
+    public String auxMunicipality;
     public InfoCompanyDTO(){} // Se requiere como constructo default
     public InfoCompanyDTO(InfoCompany infoCompany) {
         this.id = infoCompany.getId();

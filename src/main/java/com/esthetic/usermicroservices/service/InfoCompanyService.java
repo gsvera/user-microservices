@@ -36,14 +36,14 @@ public class InfoCompanyService {
         List<InfoCompanyDTO> listUserDto = new ArrayList<>();
         for(Object[] item : listProvider){
             InfoCompanyDTO infoCompanyDTO = new InfoCompanyDTO();
-            UserDTO userDTO = new UserDTO();
-            userDTO.id = (String) item[0];
-            infoCompanyDTO.userDTO = userDTO;
+            infoCompanyDTO.idUser = (String)item[0];
             infoCompanyDTO.id = (Long) item[1];
             infoCompanyDTO.companyName = (String) item[2];
             infoCompanyDTO.generalDescription = (String) item[3];
             infoCompanyDTO.companyPicture = (String)item[4];
             infoCompanyDTO.typesServices = (String) item[5];
+            infoCompanyDTO.auxState = (String) item[6];
+            infoCompanyDTO.auxMunicipality = (String) item[7];
             listUserDto.add(infoCompanyDTO);
         }
         PageDTO pageDTO = new PageDTO(listProvider);

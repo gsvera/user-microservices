@@ -28,6 +28,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
+//                .setExpiration(new Date(System.currentTimeMillis()+1000*1*24)) // PARA QUE EL TOKEN EXPIRE EN UN MINUTO
 //                .setExpiration(new Date(System.currentTimeMillis()+1000*60*24)) // PARA QUE EL TOKEN EXPIRE EN UNA HORA
                 .setExpiration(new Date(System.currentTimeMillis()+1000*60*+60*+24)) // PARA QUE EL TOKEN EXPIRE EN UN DIA
                 .signWith(GetKey(), SignatureAlgorithm.HS256)
