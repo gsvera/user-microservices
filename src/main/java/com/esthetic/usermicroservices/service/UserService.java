@@ -188,7 +188,7 @@ public class UserService {
     }
 
     public ResponseDTO _Login(LoginRequestDTO loginRequestDTO) throws Exception {
-        Optional<User> user = userRepository.findByEmail(loginRequestDTO.getUsername());
+        Optional<User> user = userRepository.findByEmailIgnoreCase(loginRequestDTO.getUsername());
 
         if(user.isPresent()) {
             if(loginRequestDTO.getIsProvider() != null && loginRequestDTO.getIsProvider()) {
@@ -209,7 +209,7 @@ public class UserService {
             boolean passwordsMatch = encoder.matches(decryptPass, user.get().getPassword());
 
             if(passwordsMatch) {
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), decryptPass));
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.get().getEmail(), decryptPass));
                 String token = jwtService.GetToken(user.get());
 
                 userRepository.updateTokenById(user.get().getId(),token);
