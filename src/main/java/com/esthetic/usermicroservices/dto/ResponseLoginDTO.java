@@ -1,13 +1,19 @@
 package com.esthetic.usermicroservices.dto;
 
+import com.esthetic.usermicroservices.entity.User;
+
 public class ResponseLoginDTO {
     public String token;
     public int idProfile;
     public String idUser;
+    public String defaultState;
+    public String defaultMunicipality;
 
-    public ResponseLoginDTO(String token, int idProfile, String idUser) {
+    public ResponseLoginDTO(String token, User user) {
         this.token = token;
-        this.idProfile = idProfile;
-        this.idUser = idUser;
+        this.idProfile = user.getIdProfile();
+        this.idUser = user.getId();
+        this.defaultState = user.getDefaultState();
+        this.defaultMunicipality = user.getDefaultMunicipality();
     }
 }

@@ -100,7 +100,7 @@ public class UserService {
 
         userRepository.updateTokenById(newUser.getId(), token);
 
-        ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser.getIdProfile(), newUser.getId());
+        ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser);
 
         return ResponseDTO.builder().items(response).build();
     }
@@ -133,7 +133,7 @@ public class UserService {
 
         userRepository.updateTokenById(newUser.getId(), token);
 
-        ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser.getIdProfile(), newUser.getId());
+        ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser);
 
         return ResponseDTO.builder().items(response).build();
     }
@@ -152,8 +152,7 @@ public class UserService {
 
         return ResponseDTO.builder().error(false).build();
     }
-
-        public ResponseDTO _UpdatePassword(String token, String newPassword) throws Exception {
+    public ResponseDTO _UpdatePassword(String token, String newPassword) throws Exception {
         Optional<User> user = userRepository.findByToken(token.substring(7));
         String decryptPass = EncrypDecrypCode.passwordDecrypt(newPassword);
         if(user.isPresent()) {
@@ -213,7 +212,7 @@ public class UserService {
                 String token = jwtService.GetToken(user.get());
 
                 userRepository.updateTokenById(user.get().getId(),token);
-                ResponseLoginDTO response = new ResponseLoginDTO(token, user.get().getIdProfile(), user.get().getId());
+                ResponseLoginDTO response = new ResponseLoginDTO(token, user.get());
 
                 return ResponseDTO.builder().items(response).build();
             }
