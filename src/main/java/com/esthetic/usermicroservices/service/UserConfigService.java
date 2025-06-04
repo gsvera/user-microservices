@@ -109,4 +109,13 @@ public class UserConfigService {
         }
         return ResponseDTO.builder().message("Información de negocio guardado con éxito").build();
     }
+    public ResponseDTO _SaveNotificationToken(String idUser, String notificationToken) {
+        Optional<User> user = userRepository.findById(idUser);
+        if(user.isPresent()) {
+            user.orElseThrow().setTokenNotification(notificationToken);
+            userRepository.save(user.get());
+            return ResponseDTO.builder().message("Token de notificaciones push guardado con éxito").build();
+        }
+        return ResponseDTO.builder().message("No se encontro el usuario").build();
+    }
 }

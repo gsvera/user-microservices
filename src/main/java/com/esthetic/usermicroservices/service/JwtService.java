@@ -24,6 +24,8 @@ public class JwtService {
         return GetToken(new HashMap<>(), user);
     }
     private String GetToken(Map<String, Object> extraClaims, User user) {
+        extraClaims.put("id_user", user.getId());
+        extraClaims.put("email", user.getEmail());
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getEmail())
@@ -41,6 +43,10 @@ public class JwtService {
 
     public String getUsernameFromToken(String token) {
         return getClaims(token, Claims::getSubject);
+    }
+    public String getIdUserFromToken(String token) {
+        Claims claims = getAllClaims(token);
+        return claims.get("id_user", String.class);
     }
 
     public boolean isTokenValid(String token, UserDetails user) {

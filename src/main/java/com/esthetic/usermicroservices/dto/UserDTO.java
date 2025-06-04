@@ -23,6 +23,7 @@ public class UserDTO {
     public String token;
     public String profilePictureB64;
     public int planSelect;
+    public String tokenNotification;
     public CatalogProfileDTO catalogProfileDTO = null;
     public PaymentPlanDTO paymentPlanDTO;
     public InfoCompanyDTO infoCompanyDTO;

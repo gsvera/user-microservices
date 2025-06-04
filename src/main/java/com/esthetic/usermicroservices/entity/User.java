@@ -48,6 +48,8 @@ public class User implements UserDetails {
     private String defaultState;
     @Column(name = "default_municipality")
     private String defaultMunicipality;
+    @Column(name = "token_notification")
+    private String tokenNotification;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
     private InfoCompany userInfoCompany;

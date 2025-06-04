@@ -28,7 +28,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "UPDATE tbl_user SET profile_picture_b64 = ?2 WHERE token = ?1", nativeQuery = true)
     int updateProfilePicture(String token, String imgB64);
     @Transactional @Modifying
-    @Query(value = "UPDATE tbl_user SET token = '' WHERE token = ?1", nativeQuery = true)
+    @Query(value = "UPDATE tbl_user SET token = NULL, token_notification = NULL WHERE token = ?1", nativeQuery = true)
     int updateToken(String token);
     @Modifying
     @Transactional

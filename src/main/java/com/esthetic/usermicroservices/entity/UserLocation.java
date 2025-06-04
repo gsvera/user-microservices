@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// SI MODIFICA ALGUN ATRIBUTO DE ESTA ENTITY VALIDAR EN OTROS MICROS QUE EL CAMBIO SEA EL MISMO ENESPECIFICO LOS
+// ATRIBUTOS QUE SE NECESITAN (services-microservices)
 @Entity
 @Table(name = "tbl_user_location")
 @Data

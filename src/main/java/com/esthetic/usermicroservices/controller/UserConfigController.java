@@ -58,8 +58,6 @@ public class UserConfigController
             @RequestParam(name = "default-municipality", required = false) String defaultMunicipality
     ) {
         try {
-            System.out.println("primero");
-            System.out.println(defaultMunicipality);
             return userConfigService._SaveDefaultLocationClient(idUser,defaultState, defaultMunicipality);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -90,6 +88,16 @@ public class UserConfigController
     public ResponseDTO SaveInfoCompany(@RequestBody InfoCompanyDTO infoCompanyDTO) {
         try{
             return userConfigService._UpdateInfoCompany(infoCompanyDTO);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @PutMapping("/save-notifications-token")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO SaveNotificationToken(@RequestBody UserDTO userDTO) {
+        try{
+            return userConfigService._SaveNotificationToken(userDTO.id, userDTO.tokenNotification);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
