@@ -249,7 +249,6 @@ public class UserService {
     }
 
     public UserDTO GetUserByToken (String token) {
-        System.out.println(token);
         Optional<User> user = userRepository.findByToken(token.substring(7));
 
         UserDTO userDto = new UserDTO(user);

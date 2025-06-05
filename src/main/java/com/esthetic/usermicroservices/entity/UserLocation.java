@@ -19,8 +19,8 @@ public class UserLocation {
     @JoinColumn(name = "id_user", insertable = true, updatable = true, nullable = false)
     @JsonBackReference
     private User user;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
     @Column(name = "id_state")
     private Long idState;
     @Column(name = "id_municipality")

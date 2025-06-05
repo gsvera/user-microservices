@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 public class UserLocationDTO {
     private String id;
     public UserDTO userDTO;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
     public String idUser; // aux
     public Long idState;
     public Long idMunicipality;
