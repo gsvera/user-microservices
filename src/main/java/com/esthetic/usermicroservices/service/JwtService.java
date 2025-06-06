@@ -25,10 +25,10 @@ public class JwtService {
     }
     private String GetToken(Map<String, Object> extraClaims, User user) {
         extraClaims.put("id_user", user.getId());
-        extraClaims.put("email", user.getEmail());
+//        extraClaims.put("email", user.getEmail());
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(user.getEmail())
+                .setSubject(user.getId())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
 //                .setExpiration(new Date(System.currentTimeMillis()+1000*1*24)) // PARA QUE EL TOKEN EXPIRE EN UN MINUTO
 //                .setExpiration(new Date(System.currentTimeMillis()+1000*60*24)) // PARA QUE EL TOKEN EXPIRE EN UNA HORA

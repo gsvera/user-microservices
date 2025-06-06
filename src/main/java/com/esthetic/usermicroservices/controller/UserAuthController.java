@@ -29,28 +29,22 @@ public class UserAuthController {
     @GetMapping("/get-data-user")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO GetUserByToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-        ResponseDTO response = new ResponseDTO();
         try{
-            response.items = userService.GetUserByToken(token);
+            return userService.GetUserByToken(token);
         } catch(Exception ex) {
-            System.out.print(ex.getMessage());
-            response.error = true;
-            response.message = "Ocurrio un error intentelo mas tarde";
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return response;
     }
     @PutMapping("/update-personel-information")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO UpdatePersonalInformation(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestBody UserDTO userDTO) {
-        ResponseDTO response = new ResponseDTO();
         try{
-            userService.UpdatePersonalInformation(token, userDTO);
+          return userService.UpdatePersonalInformation(token, userDTO);
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
-            response.error = true;
-            response.message = "Ocurrio un error intentelo mas tarde";
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return response;
     }
     @PutMapping("/update-password-by-user")
     @ResponseStatus(HttpStatus.OK)

@@ -14,8 +14,8 @@ import java.util.Optional;
 // SI MODIFICA ALGUN ATRIBUTO DE ESTA ENTITY VALIDAR EN OTROS MICROS QUE EL CAMBIO SEA EL MISMO ENESPECIFICO LOS
 // ATRIBUTOS QUE SE NECESITAN (services-microservices)
 @Entity
-@Data
-@ToString
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -83,7 +83,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.id;
     }
 
     @Override

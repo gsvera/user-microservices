@@ -65,7 +65,7 @@ public class UserService {
         newUser.setId(uuid.toString());
         newUser.setFirstName(objUser.getFirstName());
         newUser.setLastName(objUser.getLastName());
-        newUser.setEmail(objUser.getEmail());
+        newUser.setEmail(objUser.getEmail().toLowerCase());
         newUser.setBirthDate(objUser.getBirthDate());
         newUser.setLada(objUser.getLada());
         newUser.setPhone(objUser.getPhone());
@@ -120,7 +120,7 @@ public class UserService {
         newUser.setId(uuid.toString());
         newUser.setFirstName(userDTO.getFirstName());
         newUser.setLastName(userDTO.getLastName());
-        newUser.setEmail(userDTO.getEmail());
+        newUser.setEmail(userDTO.getEmail().toLowerCase());
 //        newUser.setBirthDate(objUser.getBirthDate());
         newUser.setLada(userDTO.getLada());
         newUser.setPhone(userDTO.getPhone());
@@ -139,18 +139,18 @@ public class UserService {
     }
     public ResponseDTO UpdatePersonalInformation(String token, UserDTO objUser) {
         Optional<User> user = userRepository.findByToken(token.substring(7));
+        if(user.isPresent()) {
+            user.orElseThrow().setFirstName(objUser.getFirstName());
+            user.orElseThrow().setLastName(objUser.getLastName());
+            user.orElseThrow().setPhone(objUser.getPhone());
+            user.orElseThrow().setEmail(objUser.getEmail());
+            userRepository.save(user.get());
+    //                objUser.getBirthDate(), // No se ocupa por ahora
+    //                objUser.getLada(), // Se comenta por que por ahora solo es para telefonos locales
+            return ResponseDTO.builder().error(false).build();
+        }
+        return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
 
-        userRepository.updateInformationPersonel(
-                objUser.getFirstName(),
-                objUser.getLastName(),
-//                objUser.getBirthDate(), // No se ocupa por ahora
-//                objUser.getLada(), // Se comenta por que por ahora solo es para telefonos locales
-                objUser.getPhone(),
-                objUser.getEmail(),
-                user.get().getId()
-        );
-
-        return ResponseDTO.builder().error(false).build();
     }
     public ResponseDTO _UpdatePassword(String token, String newPassword) throws Exception {
         Optional<User> user = userRepository.findByToken(token.substring(7));
@@ -208,7 +208,7 @@ public class UserService {
             boolean passwordsMatch = encoder.matches(decryptPass, user.get().getPassword());
 
             if(passwordsMatch) {
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.get().getEmail(), decryptPass));
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.get().getId(), decryptPass));
                 String token = jwtService.GetToken(user.get());
 
                 userRepository.updateTokenById(user.get().getId(),token);
@@ -248,12 +248,12 @@ public class UserService {
         return userdto;
     }
 
-    public UserDTO GetUserByToken (String token) {
+    public ResponseDTO GetUserByToken (String token) {
         Optional<User> user = userRepository.findByToken(token.substring(7));
-
-        UserDTO userDto = new UserDTO(user);
-
-        return userDto;
+        if(user.isPresent()) {
+            return ResponseDTO.builder().items(new UserDTO(user.get())).build();
+        }
+        return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
     }
 
     public ResponseDTO SendResetPassword(RequestTokenReset requestData) throws MessagingException {

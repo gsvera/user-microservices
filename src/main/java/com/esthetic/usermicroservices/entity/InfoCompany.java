@@ -3,10 +3,12 @@ package com.esthetic.usermicroservices.entity;
 import com.esthetic.usermicroservices.dto.InfoCompanyDTO;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "tbl_info_company")
 public class InfoCompany {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
