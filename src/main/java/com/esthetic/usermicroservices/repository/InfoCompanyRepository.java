@@ -20,7 +20,8 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
             "ic.company_picture, \n" +
             "STRING_AGG(ts.type_service_name_es, ','), \n" +
             "ul.aux_state, \n" +
-            "ul.aux_municipality \n" +
+            "ul.aux_municipality, \n" +
+            "(SELECT ROUND(AVG(rating),1) FROM tbl_provider_ratings WHERE id_provider = u.id AND is_pending = false AND show = true) AS rating \n" +
             "FROM tbl_user AS u \n" +
             "JOIN tbl_type_service_x_user AS tsu ON tsu.id_user = u.id \n" +
             "JOIN tbl_catalog_type_service AS ts ON tsu.id_type_service = ts.id \n" +
@@ -33,13 +34,22 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
             "      FROM tbl_type_service_x_user tsu2 \n" +
             "      WHERE tsu2.id_user = u.id \n" +
             "  )\n" +
-            "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality;", nativeQuery = true)
+            "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality;",
+            countQuery = "SELECT COUNT(DISTINCT u.id) FROM tbl_user u " +
+                    "JOIN tbl_info_company ic ON ic.id_user = u.id " +
+                    "JOIN tbl_user_location ul ON u.id = ul.id_user " +
+                    "WHERE u.is_provider = true AND u.active_provider = true " +
+                    "AND (?1 IS NULL OR ?1 = '' OR ic.company_name ILIKE CONCAT('%', ?1, '%')) " +
+                    "AND (?2 IS NULL OR ?2 = '' OR ul.aux_state ILIKE CONCAT('%', ?2, '%')) " +
+                    "AND (?3 IS NULL OR ?3 = '' OR ul.aux_municipality ILIKE CONCAT('%', ?3, '%'))",
+            nativeQuery = true)
     Page<Object[]> getProvider(String word, String defaultState, String defaultMunicipality, Pageable pageable);
 
 @Query(value = "SELECT DISTINCT(u.id), ic.id, ic.company_name, ic.general_description, ic.company_picture, " +
         "STRING_AGG(ts.type_service_name_es, ','), " +
         "ul.aux_state, " +
-        "ul.aux_municipality " +
+        "ul.aux_municipality, " +
+        "(SELECT ROUND(AVG(rating),1) FROM tbl_provider_ratings WHERE id_provider = u.id AND is_pending = false AND show = true) AS rating " +
         "FROM tbl_user AS u " +
         "JOIN tbl_type_service_x_user AS tsu ON tsu.id_user = u.id " +
         "JOIN tbl_catalog_type_service AS ts ON tsu.id_type_service = ts.id " +

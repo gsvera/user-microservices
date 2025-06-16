@@ -12,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,8 @@ public class InfoCompanyService {
             infoCompanyDTO.typesServices = (String) item[5];
             infoCompanyDTO.auxState = (String) item[6];
             infoCompanyDTO.auxMunicipality = (String) item[7];
+            BigDecimal avgRating = (BigDecimal) item[8];
+            infoCompanyDTO.auxRating = avgRating == null ? 0 : avgRating.doubleValue();
             listUserDto.add(infoCompanyDTO);
         }
         PageDTO pageDTO = new PageDTO(listProvider);
