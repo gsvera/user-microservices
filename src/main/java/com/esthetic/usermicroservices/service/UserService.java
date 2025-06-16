@@ -349,9 +349,11 @@ public class UserService {
             HttpHeaders headers = new HttpHeaders();
             HttpEntity httpEntity = new HttpEntity<>(headers);
             headers.set("Authorization", token);
-            String apiUrl = "http://localhost:8002/api/esthetic/delete-user/delete-catalog-account/"+idUser;
+            String apiUrlCatalogs = "http://localhost:8002/api/esthetic/delete-user/delete-catalog-account/"+idUser;
+            String apiUrlServices = "http://localhost:8002/api/esthetic/delete-user-services/delete-services-account/"+idUser;
 
-            apiHelper._RequestedApi(apiUrl, "DELETE", httpEntity);
+            apiHelper._RequestedApi(apiUrlCatalogs, "DELETE", httpEntity);
+            apiHelper._RequestedApi(apiUrlServices, "DELETE", httpEntity);
 
             userConfigService._DeleteLocationByUser(idUser);
             userPlanRepository.deleteAllPlanByUser(idUser);
