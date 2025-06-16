@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity @Data @Table(name = "tbl_coupon_redemption")
 public class CouponRedemption {
@@ -16,7 +17,7 @@ public class CouponRedemption {
     @Column(name = "payment_id")
     private Long paymentId;
     @Column(name = "redeemde_at")
-    private Timestamp redeemdeAt;
+    private Timestamp redeemdeAt = Timestamp.from(Instant.now());
     public CouponRedemption(String idUser, Long couponId, Long paymentId) {
         this.idUser = idUser;
         this.couponId = couponId;

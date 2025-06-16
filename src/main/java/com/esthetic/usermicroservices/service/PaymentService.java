@@ -32,7 +32,7 @@ public class PaymentService {
         paymentPlanRepository.save(paymentPlan);
 
         if(coupon.isPresent()) {
-            couponRedemptionRepository.save(new CouponRedemption(paymentPlanDTO.idUser, coupon.get().getId(), paymentPlan.getCouponId()));
+            couponRedemptionRepository.save(new CouponRedemption(paymentPlanDTO.idUser, coupon.get().getId(), paymentPlan.getId()));
             coupon.orElseThrow().setCountUsage(coupon.get().getCountUsage() + 1);
             couponRepository.save(coupon.get());
         }
