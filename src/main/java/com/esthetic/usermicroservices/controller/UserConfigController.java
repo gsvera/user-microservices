@@ -15,6 +15,15 @@ public class UserConfigController
 {
     @Autowired
     private UserConfigService userConfigService;
+    @GetMapping("/get-training")
+    public ResponseDTO GetTraining() {
+        try{
+            return userConfigService._GetTraining();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
     @GetMapping("/get-location-by-provider")
     public ResponseDTO getLocationByUser(@RequestParam(name = "id-user") String idUser) {
         try{

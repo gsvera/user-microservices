@@ -2,19 +2,15 @@ package com.esthetic.usermicroservices.service;
 
 import com.esthetic.usermicroservices.dto.*;
 import com.esthetic.usermicroservices.entity.InfoCompany;
+import com.esthetic.usermicroservices.entity.Training;
 import com.esthetic.usermicroservices.entity.User;
 import com.esthetic.usermicroservices.entity.UserLocation;
-import com.esthetic.usermicroservices.repository.InfoCompanyRepository;
-import com.esthetic.usermicroservices.repository.UserLocationRepository;
-import com.esthetic.usermicroservices.repository.UserPlanRepository;
-import com.esthetic.usermicroservices.repository.UserRepository;
+import com.esthetic.usermicroservices.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +19,11 @@ public class UserConfigService {
     private final UserRepository userRepository;
     private final UserPlanRepository userPlanRepository;
     private final InfoCompanyRepository infoCompanyRepository;
+    private final TrainingRepository trainingRepository;
+    public ResponseDTO _GetTraining() {
+        List<Training> trainingList = trainingRepository.findAll();
+        return ResponseDTO.builder().items(trainingList.stream().map(item -> new TrainingDTO(item)).collect(Collectors.toList())).build();
+    }
     public ResponseDTO _GetLocationByUser(String idUser) {
         Optional<UserLocation> userLocation = userLocationRepository.findByIdUser(idUser);
         if(userLocation.isPresent()) {
