@@ -41,6 +41,7 @@ public class UserController {
             return  ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
+
     @PostMapping("/save/user-sthetic-client")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO SaveUserClient(@RequestBody UserDTO userDTO) {
@@ -51,6 +52,7 @@ public class UserController {
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
+
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO LoginUser(@RequestBody LoginRequestDTO userLogin) {
@@ -61,30 +63,30 @@ public class UserController {
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
-    @PostMapping("/request-reset-password")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO RequestResetPassword(@RequestBody RequestTokenReset requestData) {
-        ResponseDTO response = new ResponseDTO();
-        try{
-            response.error = userService.SendResetPassword(requestData).error;
 
-        }catch (Exception ex) {
+    @PostMapping("/send-verification-code")
+    public ResponseDTO ResetDefaultPassword(@RequestBody RequestTokenReset requestTokenReset) {
+        try{
+            return userService._SendVerificationCode(requestTokenReset.email);
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            response.error = true;
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return response;
     }
+
     @PostMapping("/save-reset-password")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO SaveResetPassword(@RequestBody RequestTokenReset requestData) {
-        ResponseDTO response = new ResponseDTO();
+
         try{
-            response.error = userService.SaveResetPassword(requestData).error;
+            return userService._SaveResetPassword(requestData);
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return response;
+
     }
+
     @GetMapping("/get-provider-available")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO GetProviderAvailable(
@@ -102,6 +104,7 @@ public class UserController {
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
+
     @GetMapping("/get-provider-by-id/{id-user}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO GetProviderById(@PathVariable(name = "id-user") String idUser) {

@@ -3,6 +3,7 @@ package com.esthetic.usermicroservices.service;
 import com.esthetic.usermicroservices.clases.RequestTokenReset;
 import com.esthetic.usermicroservices.dto.*;
 import com.esthetic.usermicroservices.entity.CatalogPlan;
+import com.esthetic.usermicroservices.entity.ResetToken;
 import com.esthetic.usermicroservices.entity.UserPlan;
 import com.esthetic.usermicroservices.repository.CatalogPlanRepository;
 import com.esthetic.usermicroservices.repository.UserPlanRepository;
@@ -24,6 +25,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.security.SecureRandom;
 
 import com.esthetic.usermicroservices.repository.UserRepository;
 import com.esthetic.usermicroservices.entity.User;
@@ -154,24 +156,12 @@ public class UserService {
     }
     public ResponseDTO _UpdatePassword(String token, String newPassword) throws Exception {
         Optional<User> user = userRepository.findByToken(token.substring(7));
-        String decryptPass = EncrypDecrypCode.passwordDecrypt(newPassword);
         if(user.isPresent()) {
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            boolean isPasswordMatch = passwordEncoder.matches(decryptPass, user.get().getPassword());
-            if(isPasswordMatch) {
-                return ResponseDTO.builder().error(true).message("La contraseña no puede ser la misma que la anterior").build();
-            } else {
-                String newPasswordEncode = passwordEncoder.encode(decryptPass);
-                int updatePassword = userRepository.updatePasswordByEmail(newPasswordEncode, user.get().getEmail());
-                if(updatePassword == 0) {
-                    return ResponseDTO.builder().error(true).message("Su session ha vencido, inicie session e intente nuevamente").build();
-                } else {
-                    return ResponseDTO.builder().error(false).message("Contraseña actualizada con éxito").build();
-                }
-            }
+            return this._UpdatePasswordByUser(user.get(), newPassword);
         }
         return ResponseDTO.builder().error(true).message("Su session ha vencido, inicie session e intente nuevamente").build();
     }
+
     public ResponseDTO findUser(String email, String phone) {
         Optional<User> user = Optional.ofNullable(userRepository.findByEmailQueryNative(email, phone)) ;
         System.out.println("datos encontrados " +user);
@@ -237,7 +227,6 @@ public class UserService {
             ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
             if (response.getStatusCode().is2xxSuccessful()) {
                 Gson gson = new Gson();
-//                String responseBody = response.getBody();
                 ResponseDTO responseService = gson.fromJson(response.getBody(), ResponseDTO.class);
                 CatalogProfileDTO catalogProfileDTO = gson.fromJson(responseService.items.toString(), CatalogProfileDTO.class);
                 userdto.setCatalogProfileDTO(catalogProfileDTO);
@@ -256,13 +245,11 @@ public class UserService {
         return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
     }
 
-    public ResponseDTO SendResetPassword(RequestTokenReset requestData) throws MessagingException {
-        ResponseDTO response = new ResponseDTO();
+    public ResponseDTO _SendVerificationCode(String email) throws MessagingException {
+        Optional<User> user = userRepository.findByEmailIgnoreCase(email);
 
-        Optional<User> user = userRepository.findByEmail(requestData.email);
-
-        if(!user.isEmpty()) {
-            String token = resetTokenService.GenerateToken(requestData.email);
+        if(user.isPresent()) {
+            String codigo = resetTokenService.GenerateToken(email);
             String htmlBody = "<!DOCTYPE html>\n" +
                     "<html lang=\"en\">\n" +
                     "<head>\n" +
@@ -303,45 +290,55 @@ public class UserService {
                     "<body>\n" +
                     "    <div class=\"card-form-white-pink card-password\">\n" +
                     "        <div class=\"\">\n" +
-                    "            <h5>"+requestData.message+"</h5>\n" +
+                    "            <h5>Nuevo código  de verificación</h5>\n" +
                     "            <div style=\"display: flex; justify-content: center\">\n" +
-                    "               <a href=\""+urlFront+"/reset-new-password?token="+token+"\" type=\"button\" class=\"btn-success\" style=\"padding:10px 25px\">Restablecer / Restore</a>\n" +
+                    "               <p >Tu código  de verificación de MeCare es: <span style=\"font-weight: fold\"> "+codigo+"</span>. No lo compartas con nadie.</p>\n" +
                     "            </div>\n" +
                     "        </div>\n" +
                     "    </div>\n" +
                     "</body>\n" +
                     "</html>";
 
-            mailService.SendEmail(user.get().getEmail(), "Esthetic Reset password", htmlBody);
-            response.error = false;
-        } else{
-            response.error = true;
+            mailService.SendEmail(user.get().getEmail(), "MeCare código  de verificación", htmlBody);
+            return ResponseDTO.builder().message("Se ha enviado el codigo de verificación a su cuenta de correo").build();
         }
-        return  response;
+        return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
     }
 
-    public ResponseDTO SaveResetPassword(RequestTokenReset requestData) {
-        ResponseDTO response = new ResponseDTO();
-        ResetTokenDTO resetTokenDTO = resetTokenService.GetRecordByToken(requestData.token);
+    public ResponseDTO _SaveResetPassword(RequestTokenReset requestData) throws Exception {
+        Optional<ResetToken> resetToken = resetTokenService.GetRecordByToken(requestData.token);
+        if(resetToken.isPresent()) {
+            if(resetToken.get().getStatus() == 0 && resetToken.get().getEmail() == resetToken.get().getEmail()) {
+                Optional<User> user = userRepository.findByEmailIgnoreCase(requestData.email);
+                long elapsedMillis = System.currentTimeMillis() - resetToken.get().getCreateDate().getTime();
 
-        if(resetTokenDTO.getStatus() == 0) {
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            long differentTime = currentTime.getTime() - resetTokenDTO.getCreateDate().getTime();
-            long differentDays = differentTime / (1000 * 60 * 60 * 24);
-            if(differentDays > 1) {
-                response.error = true;
-            } else {
-                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-                String encodedPassword = encoder.encode(requestData.password);
-                int updatePassword = userRepository.updatePasswordByEmail(encodedPassword, resetTokenDTO.getEmail());
-                if(updatePassword > 0) {
-                    resetTokenService.UpdateStatus(requestData.token);
+                if(elapsedMillis < 60 * 60 * 1000 && user.isPresent()) {
+                  ResponseDTO responseDTO = this._UpdatePasswordByUser(user.get(), requestData.password);
+                  if(!responseDTO.error) {
+                      resetTokenService._DeleteToken(requestData.token);
+                      return ResponseDTO.builder().message("Se actualizo la contraseña con éxito").build();
+                  } else {
+                      return responseDTO;
+                  }
                 }
             }
-        } else {
-            response.error = true;
         }
-        return response;
+        return ResponseDTO.builder().error(true).message("El código de verificación ha caducado").build();
+    }
+
+    public ResponseDTO _UpdatePasswordByUser(User user, String newPassword) throws Exception{
+        String decryptPass = EncrypDecrypCode.passwordDecrypt(newPassword);
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        boolean isPasswordMatch = passwordEncoder.matches(decryptPass, user.getPassword());
+        if(isPasswordMatch) {
+            return ResponseDTO.builder().error(true).message("La contraseña no puede ser la misma que la anterior").build();
+        } else {
+            String newPasswordEncode = passwordEncoder.encode(decryptPass);
+            userRepository.updatePasswordByEmail(newPasswordEncode, user.getEmail());
+
+            return ResponseDTO.builder().error(false).message("Contraseña actualizada con éxito").build();
+        }
     }
     public ResponseDTO _DeleteAccount(String idUser, String token) {
         Optional<User> user = userRepository.findById(idUser);

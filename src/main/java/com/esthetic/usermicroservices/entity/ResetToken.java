@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -17,4 +18,11 @@ public class ResetToken {
     private String email;
     @Column(name = "create_date")
     private Timestamp createDate;
+    public ResetToken(){} // default constructor
+    public ResetToken(String token, String email) {
+        this.status = 0;
+        this.token = token;
+        this.email = email;
+        this.createDate = Timestamp.from(Instant.now());
+    }
 }
