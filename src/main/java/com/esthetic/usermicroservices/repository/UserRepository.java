@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query(value = "select * from tbl_user u where upper(u.email) = ?1 or u.phone = ?2", nativeQuery = true)
+    @Query(value = "SELECT * FROM tbl_user u WHERE LOWER(u.email) = LOWER(?1) OR u.phone = ?2 LIMIT 1", nativeQuery = true)
     User findByEmailQueryNative(String email, String phone);
     Optional<User> findByEmail(String email);
     Optional<User> findByEmailIgnoreCase(String email);

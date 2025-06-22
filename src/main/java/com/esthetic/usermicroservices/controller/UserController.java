@@ -7,7 +7,9 @@ import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.service.InfoCompanyService;
 import com.esthetic.usermicroservices.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +19,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private InfoCompanyService infoCompanyService;
+    @Value("${url.localhost}")
+    public String urlLocalhost;
 
     @GetMapping("/find-duplicated-user")
     @ResponseStatus(HttpStatus.OK)
@@ -61,6 +65,52 @@ public class UserController {
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+
+    @GetMapping(value = "/account-verification", produces = MediaType.TEXT_HTML_VALUE)
+    public String AccountVerification(@RequestParam(name = "account") String idUser){
+        try{
+            ResponseDTO responseDTO = userService._AccountVerification(idUser);
+
+            return "<!DOCTYPE html>\n" +
+                    "<html lang=\"en\">\n" +
+                    "<head>\n" +
+                    "    <meta charset=\"UTF-8\">\n" +
+                    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                    "    <title>MeCare</title>\n" +
+                    "    <style>\n" +
+                    "        .card {\n" +
+                    "            border-radius: 5px;\n" +
+                    "            border: solid 2px #3C3C3C;\n" +
+                    "            width: 50%;\n" +
+                    "            margin: 0 auto;\n" +
+                    "        }\n" +
+                    "        .text {\n" +
+                    "            font-family:Arial, Helvetica, sans-serif ;\n" +
+                    "            text-align: center;\n" +
+                    "        }\n" +
+                    "        .content-logo {\n" +
+                    "            display: flex;\n" +
+                    "            justify-content: center;;\n" +
+                    "        }\n" +
+                    "        .img-logo{\n" +
+                    "            width: 200px;\n" +
+                    "        }\n" +
+                    "    </style>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    "    <div class=\"card\">\n" +
+                    "        <div class=\"content-logo\">\n" +
+                    "            <img class=\"img-logo\" src=\""+urlLocalhost+"/meredith-logo.png\"/>\n" +
+                    "        </div>\n" +
+                    "        <h4 class=\"text\">"+responseDTO.message+"</h4>\n" +
+                    "    </div>\n" +
+                    "</body>\n" +
+                    "</html>";
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return "<html><body><h1>Ocurrio un error intentelo mas tarde</h1></body></html>";
         }
     }
 

@@ -47,6 +47,8 @@ public class UserService {
     private final UserConfigService userConfigService;
     @Value("${url.front}")
     public String urlFront;
+    @Value("${url.localhost}")
+    public String urlLocalhost;
 
     @Autowired
     private CatalogProfileService catalogProfileService;
@@ -76,6 +78,7 @@ public class UserService {
         newUser.setIsProvider(true);
         newUser.setIsClient(true);
         newUser.setActiveProvider(true);
+        newUser.setAccountVerification(true);
         userRepository.save(newUser);
 
         Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));
@@ -102,13 +105,12 @@ public class UserService {
 
         userRepository.updateTokenById(newUser.getId(), token);
 
-        ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser);
+        ResponseLoginDTO response = new ResponseLoginDTO(token, newUser);
 
         return ResponseDTO.builder().items(response).build();
     }
     public ResponseDTO _SaveUserStheticClient(UserDTO userDTO) throws Exception {
         Optional<User> user = Optional.ofNullable(this.FindUserDuplicate(userDTO));
-
         if(user.isPresent()) {
             return ResponseDTO.builder().message("Ya existe un usuario con esos datos").error(true).build();
         }
@@ -129,13 +131,16 @@ public class UserService {
         newUser.setPassword(encodedPassword);
 //        newUser.setIdProfile(objUser.getIdProfile());
         newUser.setIsClient(true);
+        newUser.setAccountVerification(false);
         userRepository.save(newUser);
 
         String token = jwtService.GetToken(newUser);
 
         userRepository.updateTokenById(newUser.getId(), token);
 
-        ResponseLoginDTO response = new ResponseLoginDTO(jwtService.GetToken(newUser), newUser);
+        this._SendVerificationAccount(newUser.getEmail(), newUser.getId());
+
+        ResponseLoginDTO response = new ResponseLoginDTO(token, newUser);
 
         return ResponseDTO.builder().items(response).build();
     }
@@ -244,7 +249,61 @@ public class UserService {
         }
         return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
     }
-
+    public void _SendVerificationAccount(String email, String idUser) throws MessagingException  {
+        String htmlBody = "<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "    <meta charset=\"UTF-8\">\n" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                "    <style>\n" +
+                "        .card-password {\n" +
+                "            width: 450px;\n" +
+                "            justify-content: center;\n" +
+                "            display: flex;\n" +
+                "            align-items: center;\n" +
+                "            padding: 10px !important;\n" +
+                "            margin: auto;\n" +
+                "        }\n" +
+                "        .card-form-white-pink {\n" +
+                "            box-shadow: 0 0 4px 2px rgba(180, 58, 107, 0.8);\n" +
+                "            border-radius: 3px;\n" +
+                "        }\n" +
+                "        .btn-success{\n" +
+                "            position: relative;\n" +
+                "            z-index: 1;\n" +
+                "            text-align: center;\n" +
+                "            padding: 15px 25px;\n" +
+                "            background: #D4AF37;\n" +
+                "            display: inline-block;\n" +
+                "            border-radius: 10px;\n" +
+                "            overflow: hidden;\n" +
+                "            text-decoration: none;\n" +
+                "            color: white !important;\n" +
+                "            margin: 0 auto;\n" +
+                "        }\n" +
+                "        .content-btn {\n"+
+                "            display:flex; \n" +
+                "            justify-content: center;\n" +
+                "        }\n" +
+                "    </style>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "    <div class=\"card-form-white-pink card-password\">\n" +
+                "        <div class=\"\">\n" +
+                "            <h5>Verificación de creación de cuenta MeCare</h5>\n" +
+                "            <div style=\"\">\n" +
+                "               <p>Da click en el siguiente botón para verificar tu nueva cuenta MeCare</p>\n" +
+                "               <div class=\"content-btn\">" +
+                // CAMBIAR IP AL PASAR A PROD
+                "                   <a class=\"btn-success\" href=\""+urlLocalhost+"/api/esthetic/user/account-verification?account="+idUser+"\">Verificar cuenta</a> \n"+
+                "               </div>" +
+                "            </div>\n" +
+                "        </div>\n" +
+                "    </div>\n" +
+                "</body>\n" +
+                "</html>";
+        mailService.SendEmail(email, "Verificación de cuenta MeCare", htmlBody);
+    }
     public ResponseDTO _SendVerificationCode(String email) throws MessagingException {
         Optional<User> user = userRepository.findByEmailIgnoreCase(email);
 
@@ -303,6 +362,16 @@ public class UserService {
             return ResponseDTO.builder().message("Se ha enviado el codigo de verificación a su cuenta de correo").build();
         }
         return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
+    }
+
+    public ResponseDTO _AccountVerification(String idUser) {
+        Optional<User> user = userRepository.findById(idUser);
+        if(user.isPresent()) {
+            user.orElseThrow().setAccountVerification(true);
+            userRepository.save(user.get());
+            return ResponseDTO.builder().message("Cuenta verificada con éxito para la cuenta: " + user.get().getEmail()).build();
+        }
+        return ResponseDTO.builder().error(true).message("No se encontro la cuenta").build();
     }
 
     public ResponseDTO _SaveResetPassword(RequestTokenReset requestData) throws Exception {

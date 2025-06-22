@@ -50,6 +50,8 @@ public class User implements UserDetails {
     private String defaultMunicipality;
     @Column(name = "token_notification")
     private String tokenNotification;
+    @Column(name = "account_verification")
+    private Boolean accountVerification;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
     private InfoCompany userInfoCompany;

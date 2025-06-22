@@ -36,6 +36,7 @@ public class UserAuthController {
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
+
     @PutMapping("/update-personel-information")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO UpdatePersonalInformation(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestBody UserDTO userDTO) {
