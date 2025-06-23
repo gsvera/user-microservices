@@ -409,6 +409,17 @@ public class UserService {
             return ResponseDTO.builder().error(false).message("Contraseña actualizada con éxito").build();
         }
     }
+    public void _FindUserInactive() {
+        List<User> listUser = userRepository.findUserClientInactive();
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        long millisecondsIn24Hours = 1000 * 60 * 60 * 24;
+
+        for(User user : listUser) {
+            if((currentTime.getTime() - user.getCreatedAt().getTime()) >= millisecondsIn24Hours) {
+                userRepository.deleteUserById(user.getId());
+            }
+        }
+    }
     public ResponseDTO _DeleteAccount(String idUser, String token) {
         Optional<User> user = userRepository.findById(idUser);
         if(user.isPresent() && user.get().getToken().equals(token.substring(7))) {

@@ -7,6 +7,8 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
@@ -58,6 +60,10 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
     private UserLocation userLocation;
+    @Column(name = "created_at")
+    private Timestamp createdAt = Timestamp.from(Instant.now());
+    @Column(name = "updated_at")
+    private Timestamp updatedAt;
 
     public User(Optional<User> user){
         this.id = user.get().getId();

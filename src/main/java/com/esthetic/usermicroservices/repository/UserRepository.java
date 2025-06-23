@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.esthetic.usermicroservices.entity.User;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -40,4 +41,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void removeIsClient(String id);
     @Query(value = "SELECT u FROM User u LEFT JOIN FETCH u.userInfoCompany LEFT JOIN FETCH u.userLocation WHERE u.id = ?1")
     Optional<User> findUserProviderWithDetails(String idUser);
+    @Query(value = "SELECT u FROM User u WHERE accountVerification = false AND (isProvider = false OR isProvider IS NULL)")
+    List<User> findUserClientInactive();
 }
