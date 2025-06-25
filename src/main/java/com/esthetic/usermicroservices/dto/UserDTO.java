@@ -29,6 +29,7 @@ public class UserDTO {
     public InfoCompanyDTO infoCompanyDTO;
     public UserLocationDTO userLocationDTO;
     public String typeServices;
+    public Boolean accountVerification;
     public UserDTO(Optional<User> user){
         this.id = user.get().getId();
         this.firstName = user.get().getFirstName();
@@ -78,5 +79,9 @@ public class UserDTO {
         this.profilePictureB64 = user.getProfilePictureB64();
         this.lada = user.getLada();
         this.phone = user.getPhone();
+        this.accountVerification = user.getAccountVerification();
+    }
+    public Boolean _GetVerification() {
+        return this.accountVerification;
     }
 }

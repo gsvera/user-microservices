@@ -369,7 +369,7 @@ public class UserService {
         if(user.isPresent()) {
             user.orElseThrow().setAccountVerification(true);
             userRepository.save(user.get());
-            return ResponseDTO.builder().message("Cuenta verificada con éxito para la cuenta: " + user.get().getEmail()).build();
+            return ResponseDTO.builder().message("La cuenta "+ user.get().getEmail()+" fue verificada con éxito." ).build();
         }
         return ResponseDTO.builder().error(true).message("No se encontro la cuenta").build();
     }
@@ -451,5 +451,22 @@ public class UserService {
             return ResponseDTO.builder().message("Usuario eliminado completamente").build();
         }
         return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
+    }
+
+    public ResponseDTO _GetVerificationAccount(String idUser) {
+        Optional<User> user = userRepository.findById(idUser);
+        if(user.isPresent()) {
+            return ResponseDTO.builder().items(new UserDTO(user.get())._GetVerification()).build();
+        }
+        return ResponseDTO.builder().error(true).build();
+    }
+
+    public ResponseDTO _ResendVerificationAccount(String idUser) throws MessagingException {
+        Optional<User> user = userRepository.findById(idUser);
+        if(user.isPresent()) {
+            this._SendVerificationAccount(user.get().getEmail(), idUser);
+            return ResponseDTO.builder().message("Se envio el correo de verificacion a la cuenta email del usuario").build();
+        }
+        return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
     }
 }

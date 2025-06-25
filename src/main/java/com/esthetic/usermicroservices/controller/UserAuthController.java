@@ -89,4 +89,24 @@ public class UserAuthController {
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
+
+    @GetMapping("/get-verification-account/{id-user}")
+    public ResponseDTO GetVerficiationAccount(@PathVariable(name = "id-user") String idUser){
+        try{
+            return userService._GetVerificationAccount(idUser);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+
+    @PostMapping("/resend-verification-account/{id-user}")
+    public ResponseDTO ResendVerificationAccount(@PathVariable(name = "id-user") String idUser) {
+        try{
+          return userService._ResendVerificationAccount(idUser);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
 }
