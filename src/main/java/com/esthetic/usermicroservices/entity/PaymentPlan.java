@@ -4,8 +4,7 @@ import com.esthetic.usermicroservices.dto.PaymentPlanDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -24,13 +23,13 @@ public class PaymentPlan {
     @Column(name = "coupon_id")
     private Long couponId;
     @Column(name = "payment_date")
-    private LocalDateTime paymentDate;
+    private Instant paymentDate;
     @Column(name = "payment_method")
     private String paymentMethod;
     @Column(name = "transaction_id")
     private String transactionId;
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private Instant createdAt;
     public PaymentPlan(PaymentPlanDTO paymentPlanDTO){
         this.id = paymentPlanDTO.id;
         this.idUser = paymentPlanDTO.idUser;
@@ -41,5 +40,6 @@ public class PaymentPlan {
         this.paymentDate = paymentPlanDTO.paymentDate;
         this.paymentMethod = paymentPlanDTO.paymentMethod;
         this.transactionId = paymentPlanDTO.transactionId;
+        this.createdAt = paymentPlanDTO.paymentDate;
     }
 }

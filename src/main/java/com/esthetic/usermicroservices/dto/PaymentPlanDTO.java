@@ -1,6 +1,6 @@
 package com.esthetic.usermicroservices.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class PaymentPlanDTO {
     public Long id;
@@ -9,7 +9,7 @@ public class PaymentPlanDTO {
     public Double amountPaid;
     public Double discountApplied;
     public Long couponId;
-    public LocalDateTime paymentDate;
+    public Instant paymentDate;
     public String paymentMethod;
     public String transactionId;
     public String codeCoupon;

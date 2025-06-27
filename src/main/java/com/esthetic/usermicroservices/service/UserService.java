@@ -23,9 +23,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.*;
-import java.security.SecureRandom;
 
 import com.esthetic.usermicroservices.repository.UserRepository;
 import com.esthetic.usermicroservices.entity.User;
@@ -79,24 +79,30 @@ public class UserService {
         newUser.setIsClient(true);
         newUser.setActiveProvider(true);
         newUser.setAccountVerification(true);
+        newUser.setCreatedAt(objUser.createdAt);
         userRepository.save(newUser);
 
         Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));
-        LocalDateTime startDate = LocalDateTime.now();
-        LocalDateTime endDate = startDate.plusMonths(catalogPlan.get().getDuration());
+
+        Instant createdAt = objUser.getCreatedAt();
+
+        ZonedDateTime zoned = createdAt.atZone(ZoneOffset.UTC);
+        ZonedDateTime endZoned = zoned.plusMonths(catalogPlan.get().getDuration());
+        Instant endDate = endZoned.toInstant();
+
         UserPlan userPlan = new UserPlan(
                 newUser.getId(),
                 catalogPlan.get(),
                 catalogPlan.get().getDuration(),
-                Timestamp.from(Instant.now()),
-                startDate,
+                objUser.createdAt,
+                objUser.createdAt,
                 endDate,
                 true
         );
 
         PaymentPlanDTO paymentPlanDTO = objUser.paymentPlanDTO;
         paymentPlanDTO.idUser = newUser.getId();
-        paymentPlanDTO.paymentDate = LocalDateTime.now();
+        paymentPlanDTO.paymentDate = objUser.createdAt;
         paymentService._CreatePaymentPlan(paymentPlanDTO);
 
         userPlanRepository.save(userPlan);
@@ -132,6 +138,7 @@ public class UserService {
 //        newUser.setIdProfile(objUser.getIdProfile());
         newUser.setIsClient(true);
         newUser.setAccountVerification(false);
+        newUser.setCreatedAt(userDTO.createdAt);
         userRepository.save(newUser);
 
         String token = jwtService.GetToken(newUser);
@@ -151,6 +158,7 @@ public class UserService {
             user.orElseThrow().setLastName(objUser.getLastName());
             user.orElseThrow().setPhone(objUser.getPhone());
             user.orElseThrow().setEmail(objUser.getEmail());
+            user.orElseThrow().setUpdatedAt(objUser.updatedAt);
             userRepository.save(user.get());
     //                objUser.getBirthDate(), // No se ocupa por ahora
     //                objUser.getLada(), // Se comenta por que por ahora solo es para telefonos locales
@@ -169,7 +177,6 @@ public class UserService {
 
     public ResponseDTO findUser(String email, String phone) {
         Optional<User> user = Optional.ofNullable(userRepository.findByEmailQueryNative(email, phone)) ;
-        System.out.println("datos encontrados " +user);
         if(user.isPresent()) {
             return ResponseDTO.builder().error(true).message("Ya existe un usuario con esos datos").build();
         }
@@ -415,7 +422,7 @@ public class UserService {
         long millisecondsIn24Hours = 1000 * 60 * 60 * 24;
 
         for(User user : listUser) {
-            if((currentTime.getTime() - user.getCreatedAt().getTime()) >= millisecondsIn24Hours) {
+            if((currentTime.getTime() - user.getCreatedAt().toEpochMilli()) >= millisecondsIn24Hours) {
                 userRepository.deleteUserById(user.getId());
             }
         }

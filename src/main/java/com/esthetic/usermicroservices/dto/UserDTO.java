@@ -1,9 +1,9 @@
 package com.esthetic.usermicroservices.dto;
 
 import com.esthetic.usermicroservices.entity.User;
-import jakarta.persistence.Id;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
@@ -30,6 +30,8 @@ public class UserDTO {
     public UserLocationDTO userLocationDTO;
     public String typeServices;
     public Boolean accountVerification;
+    public Instant createdAt;
+    public Instant updatedAt;
     public UserDTO(Optional<User> user){
         this.id = user.get().getId();
         this.firstName = user.get().getFirstName();
@@ -80,6 +82,8 @@ public class UserDTO {
         this.lada = user.getLada();
         this.phone = user.getPhone();
         this.accountVerification = user.getAccountVerification();
+        this.createdAt = user.getCreatedAt();
+        this.updatedAt = user.getUpdatedAt();
     }
     public Boolean _GetVerification() {
         return this.accountVerification;

@@ -3,8 +3,7 @@ package com.esthetic.usermicroservices.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -19,18 +18,18 @@ public class UserPlan {
     @JoinColumn(name = "id_plan", insertable = true, updatable = true, nullable = false)
     private CatalogPlan catalogPlan;
     @Column(name = "created_date")
-    private Timestamp createdDate;
+    private Instant createdDate;
     private int duration;
     @Column(name = "start_date")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime startDate;
+    private Instant startDate;
     @Column(name = "end_date")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime endDate;
+    private Instant endDate;
     @Column(name = "is_active")
     private Boolean isActive;
     public UserPlan(){} // Jpa requiere el constructor
-    public UserPlan(String idUser, CatalogPlan idPlan, int duration, Timestamp createdDate, LocalDateTime startDate, LocalDateTime endDate, Boolean isActive) {
+    public UserPlan(String idUser, CatalogPlan idPlan, int duration, Instant createdDate, Instant startDate, Instant endDate, Boolean isActive) {
         this.idUser = idUser;
         this.catalogPlan = idPlan;
         this.duration = duration;

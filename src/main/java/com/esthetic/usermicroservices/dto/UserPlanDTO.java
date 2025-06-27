@@ -3,17 +3,16 @@ package com.esthetic.usermicroservices.dto;
 import com.esthetic.usermicroservices.entity.CatalogPlan;
 import com.esthetic.usermicroservices.entity.UserPlan;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class UserPlanDTO {
     public Long id;
     public String idUser;
     public CatalogPlanDTO catalogPlanDTO;
-    public Timestamp createdDate;
+    public Instant createdDate;
     public int duration;
-    public LocalDateTime startDate;
-    public LocalDateTime endDate;
+    public Instant startDate;
+    public Instant endDate;
     public Boolean isActive;
     public UserPlanDTO(UserPlan userPlan, CatalogPlan catalogPlan) {
         this.id = userPlan.getId();
