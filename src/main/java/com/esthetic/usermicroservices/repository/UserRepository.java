@@ -43,4 +43,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findUserProviderWithDetails(String idUser);
     @Query(value = "SELECT u FROM User u WHERE accountVerification = false AND (isProvider = false OR isProvider IS NULL)")
     List<User> findUserClientInactive();
+
+    @Query(value = "SELECT u from User u WHERE isProvider = true")
+    List<User> findUserProvider();
 }

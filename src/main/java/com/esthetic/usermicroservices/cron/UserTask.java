@@ -20,4 +20,14 @@ public class UserTask {
             System.out.println(ex.getMessage());
         }
     }
+
+    @Scheduled(fixedDelay = 3600000)
+    @Transactional
+    public void ExecuteEnabledProvider() {
+        try{
+            userService._DisableProviderByEndPlan();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 }

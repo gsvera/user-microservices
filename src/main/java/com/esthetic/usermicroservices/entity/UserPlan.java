@@ -28,6 +28,8 @@ public class UserPlan {
     private Instant endDate;
     @Column(name = "is_active")
     private Boolean isActive;
+    @Column(name = "is_used")
+    private Boolean isUsed;
     public UserPlan(){} // Jpa requiere el constructor
     public UserPlan(String idUser, CatalogPlan idPlan, int duration, Instant createdDate, Instant startDate, Instant endDate, Boolean isActive) {
         this.idUser = idUser;

@@ -427,6 +427,15 @@ public class UserService {
             }
         }
     }
+
+    public void _DisableProviderByEndPlan() {
+        Instant today = Instant.now();
+        List<UserPlan> userPlanList = userPlanRepository.listPlanExpired(today);
+        for(UserPlan us : userPlanList) {
+            us.setIsActive(false);
+            userPlanRepository.save(us);
+        }
+    }
     public ResponseDTO _DeleteAccount(String idUser, String token) {
         Optional<User> user = userRepository.findById(idUser);
         if(user.isPresent() && user.get().getToken().equals(token.substring(7))) {
