@@ -58,7 +58,7 @@ public class InfoCompanyService {
         String api = "http://localhost:8002/api/esthetic/catalog-type-service/get-types-by-user/"+idUser;
         HttpHeaders headers = new HttpHeaders();
         HttpEntity httpEntity = new HttpEntity<>(headers);
-        ResponseDTO responseApiHelper = apiHelper._RequestedApi(api, "GET", httpEntity);
+        ResponseDTO responseApiHelper = apiHelper._RequestedApi(api, "GET", httpEntity, false);
         List<Map<String, Object>> responseItems = (List<Map<String, Object>>) responseApiHelper.items;
         String joinName = responseItems.stream().map(item -> (String)item.get("nameType")).collect(Collectors.joining(","));
 

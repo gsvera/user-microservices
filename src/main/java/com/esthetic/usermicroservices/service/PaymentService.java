@@ -21,7 +21,8 @@ public class PaymentService {
     private final CouponRedemptionRepository couponRedemptionRepository;
     public ResponseDTO _CreatePaymentPlan(PaymentPlanDTO paymentPlanDTO) {
         Optional<Coupon> coupon = null;
-        if(!paymentPlanDTO.codeCoupon.isEmpty()){
+
+        if( paymentPlanDTO.codeCoupon != null && !paymentPlanDTO.codeCoupon.isEmpty()){
              coupon = couponRepository.findByCode(paymentPlanDTO.codeCoupon);
             if(coupon.isPresent()) {
                 paymentPlanDTO.couponId = coupon.get().getId();
@@ -31,7 +32,7 @@ public class PaymentService {
         PaymentPlan paymentPlan = new PaymentPlan(paymentPlanDTO);
         paymentPlanRepository.save(paymentPlan);
 
-        if(coupon.isPresent()) {
+        if(coupon != null && coupon.isPresent()) {
             couponRedemptionRepository.save(new CouponRedemption(paymentPlanDTO.idUser, coupon.get().getId(), paymentPlan.getId()));
             coupon.orElseThrow().setCountUsage(coupon.get().getCountUsage() + 1);
             couponRepository.save(coupon.get());

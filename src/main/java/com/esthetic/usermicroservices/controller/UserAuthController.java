@@ -1,5 +1,6 @@
 package com.esthetic.usermicroservices.controller;
 
+import com.esthetic.usermicroservices.dto.PaymentPlanDTO;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.service.UserService;
@@ -104,6 +105,16 @@ public class UserAuthController {
     public ResponseDTO ResendVerificationAccount(@PathVariable(name = "id-user") String idUser) {
         try{
           return userService._ResendVerificationAccount(idUser);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+
+    @PostMapping("/save-pay-stripe")
+    public ResponseDTO SavePayStripe(@RequestBody PaymentPlanDTO paymentPlanDTO) {
+        try{
+            return  userService._SavePayStripe(paymentPlanDTO);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();

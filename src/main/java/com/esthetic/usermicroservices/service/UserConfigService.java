@@ -83,7 +83,7 @@ public class UserConfigService {
         return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
     }
     public ResponseDTO _GetMyCurrentPlan(String idUser) {
-        Optional<UserPlanDTO> userPlanDTO = userPlanRepository.findByIdUser(idUser);
+        Optional<UserPlanDTO> userPlanDTO = userPlanRepository.findByIdUserOrderByStartDateASC(idUser).stream().findFirst();
         return ResponseDTO.builder().items(userPlanDTO.get()).build();
     }
     public ResponseDTO _DeleteLocationByUser(String idUser) {

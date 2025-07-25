@@ -26,10 +26,15 @@ public class PaymentPlan {
     private Instant paymentDate;
     @Column(name = "payment_method")
     private String paymentMethod;
-    @Column(name = "transaction_id")
-    private String transactionId;
     @Column(name = "created_at")
     private Instant createdAt;
+    @Column(name = "customer_stripe")
+    private String customerStripe;
+    @Column(name = "payment_intent_stripe")
+    private String paymentIntentStripe;
+    @Column(name = "ephemeral_key_stripe")
+    private String ephemeralKeyStripe;
+
     public PaymentPlan(PaymentPlanDTO paymentPlanDTO){
         this.id = paymentPlanDTO.id;
         this.idUser = paymentPlanDTO.idUser;
@@ -39,7 +44,9 @@ public class PaymentPlan {
         this.couponId = paymentPlanDTO.couponId;
         this.paymentDate = paymentPlanDTO.paymentDate;
         this.paymentMethod = paymentPlanDTO.paymentMethod;
-        this.transactionId = paymentPlanDTO.transactionId;
         this.createdAt = paymentPlanDTO.paymentDate;
+        this.customerStripe = paymentPlanDTO.customerStripe;
+        this.paymentIntentStripe = paymentPlanDTO.paymentIntentStripe;
+        this.ephemeralKeyStripe = paymentPlanDTO.ephemeralKeyStripe;
     }
 }

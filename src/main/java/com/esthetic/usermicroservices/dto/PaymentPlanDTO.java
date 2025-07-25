@@ -11,6 +11,9 @@ public class PaymentPlanDTO {
     public Long couponId;
     public Instant paymentDate;
     public String paymentMethod;
-    public String transactionId;
     public String codeCoupon;
+    public Instant createdAt;
+    public String customerStripe;
+    public String paymentIntentStripe;
+    public String ephemeralKeyStripe;
 }

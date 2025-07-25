@@ -82,30 +82,13 @@ public class UserService {
         newUser.setCreatedAt(objUser.createdAt);
         userRepository.save(newUser);
 
-        Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(Long.valueOf(objUser.getPlanSelect()));
-
-        Instant createdAt = objUser.getCreatedAt();
-
-        ZonedDateTime zoned = createdAt.atZone(ZoneOffset.UTC);
-        ZonedDateTime endZoned = zoned.plusMonths(catalogPlan.get().getDuration());
-        Instant endDate = endZoned.toInstant();
-
-        UserPlan userPlan = new UserPlan(
-                newUser.getId(),
-                catalogPlan.get(),
-                catalogPlan.get().getDuration(),
-                objUser.createdAt,
-                objUser.createdAt,
-                endDate,
-                true
-        );
-
         PaymentPlanDTO paymentPlanDTO = objUser.paymentPlanDTO;
         paymentPlanDTO.idUser = newUser.getId();
         paymentPlanDTO.paymentDate = objUser.createdAt;
+        paymentPlanDTO.createdAt = objUser.createdAt;
         paymentService._CreatePaymentPlan(paymentPlanDTO);
 
-        userPlanRepository.save(userPlan);
+        this._makeUserPlan(Long.valueOf(objUser.getPlanSelect()), objUser.createdAt, newUser.getId());
 
         String token = jwtService.GetToken(newUser);
 
@@ -431,7 +414,12 @@ public class UserService {
     public void _DisableProviderByEndPlan() {
         Instant today = Instant.now();
         List<UserPlan> userPlanList = userPlanRepository.listPlanExpired(today);
+
         for(UserPlan us : userPlanList) {
+            Optional<UserPlanDTO> userPlanDTO = userPlanRepository.findByIdUserOrderByStartDateASC(us.getIdUser()).stream().findFirst();
+            if(userPlanDTO.isPresent()) {
+                us.setIsUsed(true);
+            }
             us.setIsActive(false);
             userPlanRepository.save(us);
         }
@@ -442,11 +430,11 @@ public class UserService {
             HttpHeaders headers = new HttpHeaders();
             HttpEntity httpEntity = new HttpEntity<>(headers);
             headers.set("Authorization", token);
-            String apiUrlCatalogs = "http://localhost:8002/api/esthetic/delete-user/delete-catalog-account/"+idUser;
-            String apiUrlServices = "http://localhost:8002/api/esthetic/delete-user-services/delete-services-account/"+idUser;
+            String apiUrlCatalogs = urlLocalhost + "/api/esthetic/delete-user/delete-catalog-account/"+idUser;
+            String apiUrlServices = urlLocalhost + "/api/esthetic/delete-user-services/delete-services-account/"+idUser;
 
-            apiHelper._RequestedApi(apiUrlCatalogs, "DELETE", httpEntity);
-            apiHelper._RequestedApi(apiUrlServices, "DELETE", httpEntity);
+            apiHelper._RequestedApi(apiUrlCatalogs, "DELETE", httpEntity, false);
+            apiHelper._RequestedApi(apiUrlServices, "DELETE", httpEntity, false);
 
             userConfigService._DeleteLocationByUser(idUser);
             userPlanRepository.deleteAllPlanByUser(idUser);
@@ -484,5 +472,41 @@ public class UserService {
             return ResponseDTO.builder().message("Se envio el correo de verificacion a la cuenta email del usuario").build();
         }
         return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
+    }
+
+    public ResponseDTO _SavePayStripe(PaymentPlanDTO paymentPlanDTO) {
+        Instant today = Instant.now();
+        Instant paymentDate = paymentPlanDTO.paymentDate;
+        userPlanRepository.updateIsUsedExpiredByUser(paymentPlanDTO.idUser, today);
+        Boolean isError = paymentService._CreatePaymentPlan(paymentPlanDTO).error;
+        if(!isError) {
+            Optional<UserPlanDTO> userPlanDTO = userPlanRepository.findByIdUserOrderByStartDateDESC(paymentPlanDTO.idUser).stream().findFirst();
+            if(userPlanDTO.isPresent()) {
+                paymentDate = userPlanDTO.get().endDate;
+            }
+
+            this._makeUserPlan(Long.valueOf(paymentPlanDTO.planId), paymentDate, paymentPlanDTO.idUser);
+            return ResponseDTO.builder().message("Pago realizado con éxito").build();
+        }
+        return ResponseDTO.builder().build();
+    }
+    private void _makeUserPlan(Long idPlan, Instant createdAt, String idUser) {
+        Optional<CatalogPlan> catalogPlan = catalogPlanRepository.findById(idPlan);
+
+        ZonedDateTime zoned = createdAt.atZone(ZoneOffset.UTC);
+        ZonedDateTime endZoned = zoned.plusMonths(catalogPlan.get().getDuration());
+        Instant endDate = endZoned.toInstant();
+
+        UserPlan userPlan = new UserPlan(
+                idUser,
+                catalogPlan.get(),
+                catalogPlan.get().getDuration(),
+                createdAt,
+                createdAt,
+                endDate,
+                true,
+                false
+        );
+        userPlanRepository.save(userPlan);
     }
 }

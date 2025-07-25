@@ -5,12 +5,15 @@ import com.esthetic.usermicroservices.dto.LoginRequestDTO;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.service.InfoCompanyService;
+import com.esthetic.usermicroservices.service.StripeService;
 import com.esthetic.usermicroservices.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/esthetic/user")
@@ -19,6 +22,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private InfoCompanyService infoCompanyService;
+    @Autowired
+    private StripeService stripeService;
     @Value("${url.localhost}")
     public String urlLocalhost;
 
@@ -161,6 +166,30 @@ public class UserController {
         try {
             return  infoCompanyService._GetProvidedrById(idUser);
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @GetMapping("/get-client-id-stripe")
+    public ResponseDTO GetClientIdStripe() {
+        try{
+            System.out.println("entro");
+            return stripeService._GetClientIdStripe();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @PostMapping("/make-order-stripe")
+    public ResponseDTO MakeOrderStripe(@RequestBody Map<String, Object> body) {
+        try{
+            Long amount = ((Integer)body.get("amount")).longValue();
+            String email = (String)body.get("email");
+            String name = (String)body.get("name");
+
+            return stripeService._MakeOrder(amount, email, name);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
