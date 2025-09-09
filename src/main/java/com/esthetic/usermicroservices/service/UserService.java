@@ -1,11 +1,13 @@
 package com.esthetic.usermicroservices.service;
 
 import com.esthetic.usermicroservices.clases.RequestTokenReset;
+import com.esthetic.usermicroservices.config.EnvConfig;
 import com.esthetic.usermicroservices.dto.*;
 import com.esthetic.usermicroservices.entity.CatalogPlan;
 import com.esthetic.usermicroservices.entity.ResetToken;
 import com.esthetic.usermicroservices.entity.UserPlan;
 import com.esthetic.usermicroservices.repository.CatalogPlanRepository;
+import com.esthetic.usermicroservices.repository.InfoCompanyRepository;
 import com.esthetic.usermicroservices.repository.UserPlanRepository;
 import com.esthetic.usermicroservices.utils.ApiHelper;
 import com.esthetic.usermicroservices.utils.EncrypDecrypCode;
@@ -45,10 +47,10 @@ public class UserService {
     private final PaymentService paymentService;
     private final ApiHelper apiHelper;
     private final UserConfigService userConfigService;
-    @Value("${url.front}")
-    public String urlFront;
-    @Value("${url.localhost}")
-    public String urlLocalhost;
+    private final InfoCompanyRepository infoCompanyRepository;
+
+    @Autowired
+    public EnvConfig envConfig;
 
     @Autowired
     private CatalogProfileService catalogProfileService;
@@ -218,7 +220,7 @@ public class UserService {
         UserDTO userdto = new UserDTO(user);
         if(userdto.getIdProfile() != 0){
             RestTemplate restTemplate = new RestTemplate();
-            String apiUrl = "http://localhost:8002/api/esthetic/catalog-profile/"+userdto.getIdProfile();
+            String apiUrl = envConfig.getApiGateway() + "/api/esthetic/catalog-profile/"+userdto.getIdProfile();
             ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
             if (response.getStatusCode().is2xxSuccessful()) {
                 Gson gson = new Gson();
@@ -284,8 +286,7 @@ public class UserService {
                 "            <div style=\"\">\n" +
                 "               <p>Da click en el siguiente botón para verificar tu nueva cuenta MeCare</p>\n" +
                 "               <div class=\"content-btn\">" +
-                // CAMBIAR IP AL PASAR A PROD
-                "                   <a class=\"btn-success\" href=\""+urlLocalhost+"/api/esthetic/user/account-verification?account="+idUser+"\">Verificar cuenta</a> \n"+
+                "                   <a class=\"btn-success\" href=\""+envConfig.getApiGateway()+"/api/esthetic/user/account-verification?account="+idUser+"\">Verificar cuenta</a> \n"+
                 "               </div>" +
                 "            </div>\n" +
                 "        </div>\n" +
@@ -430,14 +431,15 @@ public class UserService {
             HttpHeaders headers = new HttpHeaders();
             HttpEntity httpEntity = new HttpEntity<>(headers);
             headers.set("Authorization", token);
-            String apiUrlCatalogs = urlLocalhost + "/api/esthetic/delete-user/delete-catalog-account/"+idUser;
-            String apiUrlServices = urlLocalhost + "/api/esthetic/delete-user-services/delete-services-account/"+idUser;
+            String apiUrlCatalogs = envConfig.getApiGateway() + "/api/esthetic/delete-user/delete-catalog-account/"+idUser;
+            String apiUrlServices = envConfig.getApiGateway() + "/api/esthetic/delete-user-services/delete-services-account/"+idUser;
 
             apiHelper._RequestedApi(apiUrlCatalogs, "DELETE", httpEntity, false);
             apiHelper._RequestedApi(apiUrlServices, "DELETE", httpEntity, false);
 
             userConfigService._DeleteLocationByUser(idUser);
             userPlanRepository.deleteAllPlanByUser(idUser);
+            infoCompanyRepository.deleteInfoCompany(idUser);
             userRepository.deleteUserById(idUser);
             return ResponseDTO.builder().message("Usuario eliminado completamente").build();
         }

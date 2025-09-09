@@ -1,6 +1,7 @@
 package com.esthetic.usermicroservices.controller;
 
 import com.esthetic.usermicroservices.clases.RequestTokenReset;
+import com.esthetic.usermicroservices.config.EnvConfig;
 import com.esthetic.usermicroservices.dto.LoginRequestDTO;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
@@ -8,7 +9,6 @@ import com.esthetic.usermicroservices.service.InfoCompanyService;
 import com.esthetic.usermicroservices.service.StripeService;
 import com.esthetic.usermicroservices.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +24,11 @@ public class UserController {
     private InfoCompanyService infoCompanyService;
     @Autowired
     private StripeService stripeService;
-    @Value("${url.localhost}")
-    public String urlLocalhost;
+    @Autowired
+    public EnvConfig envConfig;
+
+    @GetMapping("/prueba")
+    public ResponseDTO prueba () {return ResponseDTO.builder().message("Prueba de alcance").build();}
 
     @GetMapping("/find-duplicated-user")
     @ResponseStatus(HttpStatus.OK)
@@ -107,7 +110,7 @@ public class UserController {
                     "<body>\n" +
                     "    <div class=\"card\">\n" +
                     "        <div class=\"content-logo\">\n" +
-                    "            <img class=\"img-logo\" src=\""+urlLocalhost+"/meredith-logo.png\"/>\n" +
+                    "            <img class=\"img-logo\" src=\""+envConfig.getApiGateway()+"/meraesthetic-logo.png\"/>\n" +
                     "        </div>\n" +
                     "        <h4 class=\"text\">"+responseDTO.message+"</h4>\n" +
                     "    </div>\n" +

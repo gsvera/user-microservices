@@ -1,11 +1,14 @@
 package com.esthetic.usermicroservices.service;
 
+import com.esthetic.usermicroservices.config.EnvConfig;
 import com.esthetic.usermicroservices.dto.*;
 import com.esthetic.usermicroservices.entity.User;
 import com.esthetic.usermicroservices.repository.InfoCompanyRepository;
 import com.esthetic.usermicroservices.repository.UserRepository;
 import com.esthetic.usermicroservices.utils.ApiHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
@@ -22,6 +25,8 @@ public class InfoCompanyService {
     private final InfoCompanyRepository infoCompanyRepository;
     private final UserRepository userRepository;
     private final ApiHelper apiHelper;
+    @Autowired
+    private EnvConfig envConfig;
     public ResponseDTO _GetProviderAvailable(int page, int size, String typeService, String word, String defaultState, String defaultMunicipality) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Object[]> listProvider = null;
@@ -55,7 +60,7 @@ public class InfoCompanyService {
         return ResponseDTO.builder().items(pageDTO).build();
     }
     public ResponseDTO _GetProvidedrById(String idUser) {
-        String api = "http://localhost:8002/api/esthetic/catalog-type-service/get-types-by-user/"+idUser;
+        String api = envConfig.getApiGateway() + "/api/esthetic/catalog-type-service/get-types-by-user/"+idUser;
         HttpHeaders headers = new HttpHeaders();
         HttpEntity httpEntity = new HttpEntity<>(headers);
         ResponseDTO responseApiHelper = apiHelper._RequestedApi(api, "GET", httpEntity, false);

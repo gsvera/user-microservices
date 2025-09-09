@@ -4,8 +4,10 @@ import com.esthetic.usermicroservices.entity.InfoCompany;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -34,6 +36,7 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
             "      FROM tbl_type_service_x_user tsu2 \n" +
             "      WHERE tsu2.id_user = u.id \n" +
             "  )\n" +
+            "AND (SELECT t.is_active FROM tbl_user_plan t WHERE id_user = u.id AND is_active = true LIMIT 1) \n" +
             "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality;",
             countQuery = "SELECT COUNT(DISTINCT u.id) FROM tbl_user u " +
                     "JOIN tbl_info_company ic ON ic.id_user = u.id " +
@@ -64,6 +67,7 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
         "    WHERE tsu2.id_user = u.id " +
         "    AND tsu2.id_type_service = ANY(CAST(:types AS int[]))" +
         ")) " +
+        "AND (SELECT t.is_active FROM tbl_user_plan t WHERE id_user = u.id AND is_active = true LIMIT 1) " +
         "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality ",
         countQuery = "SELECT COUNT(*) FROM tbl_user AS u " +
                 "JOIN tbl_type_service_x_user AS tsu ON tsu.id_user = u.id " +
@@ -81,4 +85,9 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
                 "))",
         nativeQuery = true)
 Page<Object[]> getProviderByTypeServices(@Param("word") String word, @Param("defaultState") String defaultState, @Param("defaultMunicipality") String defaultMunicipality, @Param("types") Integer[] typeService, Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM InfoCompany WHERE user.id = ?1")
+    void deleteInfoCompany(String idProvider);
 }
