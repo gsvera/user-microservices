@@ -12,7 +12,8 @@ import lombok.Data;
 public class Training {
     @Id
     private Long id;
-    private Integer order;
+    @Column(name = "order_show")
+    private Integer orderShow;
     @Column(name = "name_video")
     private String nameVideo;
     private String description;
