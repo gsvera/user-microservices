@@ -242,64 +242,8 @@ public class UserService {
         return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
     }
     public void _SendVerificationAccount(String email, String idUser) throws MessagingException  {
-        String htmlBody = "<!DOCTYPE html>\n" +
-                "<html lang=\"en\">\n" +
-                "<head>\n" +
-                "    <meta charset=\"UTF-8\">\n" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                "    <style>\n" +
-                "        .card-password {\n" +
-                "            width: 450px;\n" +
-                "            justify-content: center;\n" +
-                "            display: flex;\n" +
-                "            align-items: center;\n" +
-                "            padding: 10px !important;\n" +
-                "            margin: auto;\n" +
-                "        }\n" +
-                "        .card-form-white-pink {\n" +
-                "            box-shadow: 0 0 4px 2px rgba(180, 58, 107, 0.8);\n" +
-                "            border-radius: 3px;\n" +
-                "        }\n" +
-                "        .btn-success{\n" +
-                "            position: relative;\n" +
-                "            z-index: 1;\n" +
-                "            text-align: center;\n" +
-                "            padding: 15px 25px;\n" +
-                "            background: #D4AF37;\n" +
-                "            display: inline-block;\n" +
-                "            border-radius: 10px;\n" +
-                "            overflow: hidden;\n" +
-                "            text-decoration: none;\n" +
-                "            color: white !important;\n" +
-                "            margin: 0 auto;\n" +
-                "        }\n" +
-                "        .content-btn {\n"+
-                "            display:flex; \n" +
-                "            justify-content: center;\n" +
-                "        }\n" +
-                "    </style>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "    <div class=\"card-form-white-pink card-password\">\n" +
-                "        <div class=\"\">\n" +
-                "            <h5>Verificación de creación de cuenta MeCare</h5>\n" +
-                "            <div style=\"\">\n" +
-                "               <p>Da click en el siguiente botón para verificar tu nueva cuenta MeCare</p>\n" +
-                "               <div class=\"content-btn\">" +
-                "                   <a class=\"btn-success\" href=\""+envConfig.getApiGateway()+"/api/esthetic/user/account-verification?account="+idUser+"\">Verificar cuenta</a> \n"+
-                "               </div>" +
-                "            </div>\n" +
-                "        </div>\n" +
-                "    </div>\n" +
-                "</body>\n" +
-                "</html>";
-        mailService.SendEmail(email, "Verificación de cuenta MeCare", htmlBody);
-    }
-    public ResponseDTO _SendVerificationCode(String email) throws MessagingException {
-        Optional<User> user = userRepository.findByEmailIgnoreCase(email);
+        try {
 
-        if(user.isPresent()) {
-            String codigo = resetTokenService.GenerateToken(email);
             String htmlBody = "<!DOCTYPE html>\n" +
                     "<html lang=\"en\">\n" +
                     "<head>\n" +
@@ -323,34 +267,99 @@ public class UserService {
                     "            z-index: 1;\n" +
                     "            text-align: center;\n" +
                     "            padding: 15px 25px;\n" +
-                    "            background: linear-gradient(to right, rgba(180, 58, 107, 0.8), rgba(180, 58, 107, 0.8));\n" +
-                    "            color: #fff;\n" +
+                    "            background: #D4AF37;\n" +
                     "            display: inline-block;\n" +
-                    "            border-radius: 0;\n" +
-                    "            border: none;\n" +
+                    "            border-radius: 10px;\n" +
                     "            overflow: hidden;\n" +
                     "            text-decoration: none;\n" +
-                    "            color: white;\n" +
+                    "            color: white !important;\n" +
+                    "            margin: 0 auto;\n" +
                     "        }\n" +
-                    "        .ii a[href]{\n"+
-                    "            color: white;\n" +
+                    "        .content-btn {\n"+
+                    "            display:flex; \n" +
+                    "            justify-content: center;\n" +
                     "        }\n" +
                     "    </style>\n" +
                     "</head>\n" +
                     "<body>\n" +
                     "    <div class=\"card-form-white-pink card-password\">\n" +
                     "        <div class=\"\">\n" +
-                    "            <h5>Nuevo código  de verificación</h5>\n" +
-                    "            <div style=\"display: flex; justify-content: center\">\n" +
-                    "               <p >Tu código  de verificación de MeCare es: <span style=\"font-weight: fold\"> "+codigo+"</span>. No lo compartas con nadie.</p>\n" +
+                    "            <h5>Verificación de creación de cuenta MeCare</h5>\n" +
+                    "            <div style=\"\">\n" +
+                    "               <p>Da click en el siguiente botón para verificar tu nueva cuenta MeCare</p>\n" +
+                    "               <div class=\"content-btn\">" +
+                    "                   <a class=\"btn-success\" href=\""+envConfig.getApiGateway()+"/api/esthetic/user/account-verification?account="+idUser+"\">Verificar cuenta</a> \n"+
+                    "               </div>" +
                     "            </div>\n" +
                     "        </div>\n" +
                     "    </div>\n" +
                     "</body>\n" +
                     "</html>";
+            mailService.SendEmail(email, "Verificación de cuenta MeCare", htmlBody);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    public ResponseDTO _SendVerificationCode(String email) throws MessagingException {
+        try {
+            Optional<User> user = userRepository.findByEmailIgnoreCase(email);
 
-            mailService.SendEmail(user.get().getEmail(), "MeCare código  de verificación", htmlBody);
-            return ResponseDTO.builder().message("Se ha enviado el codigo de verificación a su cuenta de correo").build();
+            if(user.isPresent()) {
+                String codigo = resetTokenService.GenerateToken(email);
+                String htmlBody = "<!DOCTYPE html>\n" +
+                        "<html lang=\"en\">\n" +
+                        "<head>\n" +
+                        "    <meta charset=\"UTF-8\">\n" +
+                        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                        "    <style>\n" +
+                        "        .card-password {\n" +
+                        "            width: 450px;\n" +
+                        "            justify-content: center;\n" +
+                        "            display: flex;\n" +
+                        "            align-items: center;\n" +
+                        "            padding: 10px !important;\n" +
+                        "            margin: auto;\n" +
+                        "        }\n" +
+                        "        .card-form-white-pink {\n" +
+                        "            box-shadow: 0 0 4px 2px rgba(180, 58, 107, 0.8);\n" +
+                        "            border-radius: 3px;\n" +
+                        "        }\n" +
+                        "        .btn-success{\n" +
+                        "            position: relative;\n" +
+                        "            z-index: 1;\n" +
+                        "            text-align: center;\n" +
+                        "            padding: 15px 25px;\n" +
+                        "            background: linear-gradient(to right, rgba(180, 58, 107, 0.8), rgba(180, 58, 107, 0.8));\n" +
+                        "            color: #fff;\n" +
+                        "            display: inline-block;\n" +
+                        "            border-radius: 0;\n" +
+                        "            border: none;\n" +
+                        "            overflow: hidden;\n" +
+                        "            text-decoration: none;\n" +
+                        "            color: white;\n" +
+                        "        }\n" +
+                        "        .ii a[href]{\n"+
+                        "            color: white;\n" +
+                        "        }\n" +
+                        "    </style>\n" +
+                        "</head>\n" +
+                        "<body>\n" +
+                        "    <div class=\"card-form-white-pink card-password\">\n" +
+                        "        <div class=\"\">\n" +
+                        "            <h5>Nuevo código  de verificación</h5>\n" +
+                        "            <div style=\"display: flex; justify-content: center\">\n" +
+                        "               <p >Tu código  de verificación de MeCare es: <span style=\"font-weight: fold\"> "+codigo+"</span>. No lo compartas con nadie.</p>\n" +
+                        "            </div>\n" +
+                        "        </div>\n" +
+                        "    </div>\n" +
+                        "</body>\n" +
+                        "</html>";
+
+                mailService.SendEmail(user.get().getEmail(), "MeCare código  de verificación", htmlBody);
+                return ResponseDTO.builder().message("Se ha enviado el codigo de verificación a su cuenta de correo").build();
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
         return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
     }
