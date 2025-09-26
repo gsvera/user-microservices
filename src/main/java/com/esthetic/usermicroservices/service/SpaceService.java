@@ -50,10 +50,10 @@ public class SpaceService {
     public void deleteFile(String fileKey) {
         try{
             String key = extractKeyFromUrl(fileKey);
-            System.out.println("url cortada "+key);
+
             s3.deleteObject(DeleteObjectRequest.builder()
                     .bucket(envConfig.getS3Bucket())
-                    .key(fileKey) // aquí se pasa el "path/nombreArchivo"
+                    .key(key) // aquí se pasa el "path/nombreArchivo"
                     .build());
         } catch (Exception ex) {
             System.out.println("->"+ ex.getMessage());

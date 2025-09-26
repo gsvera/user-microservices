@@ -28,3 +28,9 @@ url.localhost=http://localhost:8002
 logging.level.org.springframework.security=DEBUG
 
 my.property.api.gateway=http://localhost:8002
+
+cloud.aws.s3.endpoint=https://meredith-aesthetic-pictures.sfo3.digitaloceanspaces.com
+cloud.aws.se.bucket=meredith-aesthetic-pictures
+cloud.aws.s3.dirprofile=profile
+cloud.aws.s3.dirinfocompany=infocompany
+cloud.aws.s3.region=sfo3
