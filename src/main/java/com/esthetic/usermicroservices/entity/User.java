@@ -37,8 +37,8 @@ public class User implements UserDetails {
     @Column(name = "id_profile")
     private int idProfile;
     private String token;
-    @Column(name = "profile_picture_b64")
-    private String profilePictureB64;
+    @Column(name = "profile_picture")
+    private String profilePicture;
     @Column(name = "is_client")
     private Boolean isClient;
     @Column(name = "is_provider")

@@ -32,7 +32,8 @@ public class JwtService {
                 .setIssuedAt(new Date(System.currentTimeMillis()))
 //                .setExpiration(new Date(System.currentTimeMillis()+1000*1*24)) // PARA QUE EL TOKEN EXPIRE EN UN MINUTO
 //                .setExpiration(new Date(System.currentTimeMillis()+1000*60*24)) // PARA QUE EL TOKEN EXPIRE EN UNA HORA
-                .setExpiration(new Date(System.currentTimeMillis()+1000*60*+60*+24)) // PARA QUE EL TOKEN EXPIRE EN UN DIA
+//                .setExpiration(new Date(System.currentTimeMillis()+1000*60*+60*+24)) // PARA QUE EL TOKEN EXPIRE EN UN DIA
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 365)) // PARA QUE EL TOKEN EXPIRE EN UN AÑO
                 .signWith(GetKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

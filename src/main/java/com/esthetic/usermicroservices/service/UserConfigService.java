@@ -1,5 +1,6 @@
 package com.esthetic.usermicroservices.service;
 
+import com.esthetic.usermicroservices.config.EnvConfig;
 import com.esthetic.usermicroservices.dto.*;
 import com.esthetic.usermicroservices.entity.InfoCompany;
 import com.esthetic.usermicroservices.entity.Training;
@@ -8,7 +9,9 @@ import com.esthetic.usermicroservices.entity.UserLocation;
 import com.esthetic.usermicroservices.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,8 @@ public class UserConfigService {
     private final UserPlanRepository userPlanRepository;
     private final InfoCompanyRepository infoCompanyRepository;
     private final TrainingRepository trainingRepository;
+    private final SpaceService spaceService;
+    private final EnvConfig envConfig;
     public ResponseDTO _GetTraining() {
         List<Training> trainingList = trainingRepository.findAll();
         return ResponseDTO.builder().items(trainingList.stream().map(item -> new TrainingDTO(item)).collect(Collectors.toList())).build();
@@ -73,14 +78,26 @@ public class UserConfigService {
         }
         return ResponseDTO.builder().error(false).message("Se ha guardado la ubicación con éxito").build();
     }
-    public ResponseDTO _SaveprofilePicture(UserDTO userDTO) {
-        Optional<User> user = userRepository.findById(userDTO.getId());
-        if(user.isPresent()) {
-            user.orElseThrow().setProfilePictureB64(userDTO.getProfilePictureB64());
-            userRepository.save(user.get());
-            return ResponseDTO.builder().message("Imagen actualizada con éxito").build();
+    public ResponseDTO _SaveprofilePicture(String idUser, MultipartFile file) throws IOException {
+        try{
+            Optional<User> user = userRepository.findById(idUser);
+            if(user.isPresent()) {
+                String fileName = envConfig.getDirProfile() +"/"+ file.getOriginalFilename();
+
+                if(user.get().getProfilePicture() != null){
+                    spaceService.deleteFile(user.get().getProfilePicture());
+                }
+
+                String urlProfile = spaceService.uploadFile(fileName, file.getContentType(), file.getInputStream(), file.getSize());
+                user.orElseThrow().setProfilePicture(urlProfile);
+                userRepository.save(user.get());
+                return ResponseDTO.builder().message("Imagen actualizada con éxito").build();
+            }
+            return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
-        return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
     }
     public ResponseDTO _GetMyCurrentPlan(String idUser) {
         Optional<UserPlanDTO> userPlanDTO = userPlanRepository.findByIdUserOrderByStartDateASC(idUser).stream().findFirst();
@@ -94,18 +111,28 @@ public class UserConfigService {
         Optional<InfoCompany> infoCompany = infoCompanyRepository.findByIdUser(idUser);
         return ResponseDTO.builder().items(new InfoCompanyDTO(infoCompany.get())).build();
     }
-    public ResponseDTO _UpdateInfoCompany(InfoCompanyDTO infoCompanyDTO) {
+    public ResponseDTO _UpdateInfoCompany(InfoCompanyDTO infoCompanyDTO, MultipartFile file) throws IOException{
         Optional<InfoCompany> infoCompany = infoCompanyRepository.findByIdUser(infoCompanyDTO.idUser);
+        String fileName = envConfig.getDirInfoCompany() +"/"+ file.getOriginalFilename();
+
         if(infoCompany.isPresent()) {
+            if(infoCompany.get().getCompanyPictureUrl() != null) {
+                spaceService.deleteFile(infoCompany.get().getCompanyPictureUrl());
+            }
+
+            String urlCompanyPicture = spaceService.uploadFile(fileName, file.getContentType(), file.getInputStream(), file.getSize());
+
             infoCompany.orElseThrow().setGeneralDescription(infoCompanyDTO.generalDescription);
             infoCompany.orElseThrow().setCompanyName(infoCompanyDTO.companyName);
-            infoCompany.orElseThrow().setCompanyPicture(infoCompanyDTO.companyPicture);
+            infoCompany.orElseThrow().setCompanyPictureUrl(urlCompanyPicture);
             infoCompany.orElseThrow().setFacebook(infoCompanyDTO.facebook);
             infoCompany.orElseThrow().setInstagram(infoCompanyDTO.instagram);
             infoCompany.orElseThrow().setWebPage(infoCompanyDTO.webPage);
             infoCompanyRepository.save(infoCompany.get());
         } else {
+            String urlCompanyPicture = spaceService.uploadFile(fileName, file.getContentType(), file.getInputStream(), file.getSize());
             infoCompanyDTO.userDTO = new UserDTO(new User(infoCompanyDTO.idUser));
+            infoCompanyDTO.companyPictureUrl = urlCompanyPicture;
             infoCompanyRepository.save(new InfoCompany(infoCompanyDTO));
         }
         return ResponseDTO.builder().message("Información de negocio guardado con éxito").build();

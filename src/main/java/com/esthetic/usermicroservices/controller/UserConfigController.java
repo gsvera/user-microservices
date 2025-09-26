@@ -5,9 +5,11 @@ import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.dto.UserLocationDTO;
 import com.esthetic.usermicroservices.service.UserConfigService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/esthetic/auth-user-config")
@@ -74,12 +76,12 @@ public class UserConfigController
         }
     }
     @PutMapping("/save-profile-picture")
-    public ResponseDTO saveProfilePicture(@RequestBody UserDTO userDTO) {
+    public ResponseDTO saveProfilePicture(@RequestParam(name ="id-user") String idUser, @RequestParam("file")MultipartFile file) {
         try{
-            return userConfigService._SaveprofilePicture(userDTO);
+            return userConfigService._SaveprofilePicture(idUser, file);
         }catch(Exception ex) {
             System.out.println(ex.getMessage());
-            return ResponseDTO.builder().error(true).message(ex.getMessage()).build();
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
     @GetMapping("/get-info-company-by-user/{id-user}")
@@ -94,9 +96,11 @@ public class UserConfigController
     }
     @PutMapping("/update-info-company")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO SaveInfoCompany(@RequestBody InfoCompanyDTO infoCompanyDTO) {
+    public ResponseDTO SaveInfoCompany(@RequestParam("file") MultipartFile file, @RequestParam String infoCompanyDTOJson) {
         try{
-            return userConfigService._UpdateInfoCompany(infoCompanyDTO);
+            ObjectMapper mapper = new ObjectMapper();
+            InfoCompanyDTO infoCompanyDTO = mapper.readValue(infoCompanyDTOJson, InfoCompanyDTO.class);
+            return userConfigService._UpdateInfoCompany(infoCompanyDTO, file);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();

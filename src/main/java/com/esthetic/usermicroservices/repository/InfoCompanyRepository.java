@@ -19,7 +19,7 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
             "ic.id, \n" +
             "ic.company_name, \n" +
             "ic.general_description, \n" +
-            "ic.company_picture, \n" +
+            "ic.company_picture_url, \n" +
             "STRING_AGG(ts.type_service_name_es, ','), \n" +
             "ul.aux_state, \n" +
             "ul.aux_municipality, \n" +
@@ -48,7 +48,7 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
             nativeQuery = true)
     Page<Object[]> getProvider(String word, String defaultState, String defaultMunicipality, Pageable pageable);
 
-@Query(value = "SELECT DISTINCT(u.id), ic.id, ic.company_name, ic.general_description, ic.company_picture, " +
+@Query(value = "SELECT DISTINCT(u.id), ic.id, ic.company_name, ic.general_description, ic.company_picture_url, " +
         "STRING_AGG(ts.type_service_name_es, ','), " +
         "ul.aux_state, " +
         "ul.aux_municipality, " +

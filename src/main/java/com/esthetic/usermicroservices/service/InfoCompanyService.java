@@ -46,7 +46,7 @@ public class InfoCompanyService {
             infoCompanyDTO.id = (Long) item[1];
             infoCompanyDTO.companyName = (String) item[2];
             infoCompanyDTO.generalDescription = (String) item[3];
-            infoCompanyDTO.companyPicture = (String)item[4];
+            infoCompanyDTO.companyPictureUrl = (String)item[4];
             infoCompanyDTO.typesServices = (String) item[5];
             infoCompanyDTO.auxState = (String) item[6];
             infoCompanyDTO.auxMunicipality = (String) item[7];

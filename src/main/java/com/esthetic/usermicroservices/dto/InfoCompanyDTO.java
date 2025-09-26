@@ -7,7 +7,7 @@ public class InfoCompanyDTO {
     public String generalDescription;
     public UserDTO userDTO;
     public String companyName;
-    public String companyPicture;
+    public String companyPictureUrl;
     public String facebook;
     public String instagram;
     public String webPage;
@@ -22,7 +22,7 @@ public class InfoCompanyDTO {
         this.generalDescription = infoCompany.getGeneralDescription();
         this.userDTO = new UserDTO(infoCompany.getUser());
         this.companyName = infoCompany.getCompanyName();
-        this.companyPicture = infoCompany.getCompanyPicture();
+        this.companyPictureUrl = infoCompany.getCompanyPictureUrl();
         this.facebook = infoCompany.getFacebook();
         this.instagram = infoCompany.getInstagram();
         this.webPage = infoCompany.getWebPage();
@@ -31,7 +31,7 @@ public class InfoCompanyDTO {
         this.id = infoCompany.getId();
         this.generalDescription = infoCompany.getGeneralDescription();
         this.companyName = infoCompany.getCompanyName();
-        this.companyPicture = infoCompany.getCompanyPicture();
+        this.companyPictureUrl = infoCompany.getCompanyPictureUrl();
         this.facebook = infoCompany.getFacebook();
         this.instagram = infoCompany.getInstagram();
         this.webPage = infoCompany.getWebPage();

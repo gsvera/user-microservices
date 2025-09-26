@@ -21,7 +21,7 @@ public class UserDTO {
     public String password;
     public int idProfile;
     public String token;
-    public String profilePictureB64;
+    public String profilePicture;
     public int planSelect;
     public String tokenNotification;
     public CatalogProfileDTO catalogProfileDTO = null;
@@ -41,7 +41,7 @@ public class UserDTO {
         this.lada = user.get().getLada();
         this.phone = user.get().getPhone();
         this.idProfile = user.get().getIdProfile();
-        this.profilePictureB64 = user.get().getProfilePictureB64();
+        this.profilePicture = user.get().getProfilePicture();
 
         if(user.get().getUserInfoCompany() != null) {
             InfoCompanyDTO infoCompanyDTO = new InfoCompanyDTO(user.get().getUserInfoCompany());
@@ -60,7 +60,7 @@ public class UserDTO {
         this.email = user.get().getEmail();
         this.lada = user.get().getLada();
         this.phone = user.get().getPhone();
-        this.profilePictureB64 = user.get().getProfilePictureB64();
+        this.profilePicture = user.get().getProfilePicture();
 
         if(user.get().getUserInfoCompany() != null) {
             InfoCompanyDTO infoCompanyDTO = new InfoCompanyDTO(user.get().getUserInfoCompany(), includeDetail);
@@ -78,7 +78,7 @@ public class UserDTO {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.idProfile = user.getIdProfile();
-        this.profilePictureB64 = user.getProfilePictureB64();
+        this.profilePicture = user.getProfilePicture();
         this.lada = user.getLada();
         this.phone = user.getPhone();
         this.accountVerification = user.getAccountVerification();

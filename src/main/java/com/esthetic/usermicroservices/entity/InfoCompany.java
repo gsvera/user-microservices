@@ -21,8 +21,8 @@ public class InfoCompany {
     private User user;
     @Column(name = "company_name")
     private String companyName;
-    @Column(name = "company_picture")
-    private String companyPicture;
+    @Column(name = "company_picture_url")
+    private String companyPictureUrl;
     private String facebook;
     private String instagram;
     @Column(name = "web_page")
@@ -32,7 +32,7 @@ public class InfoCompany {
         this.generalDescription = infoCompanyDTO.generalDescription;
         this.user = new User(infoCompanyDTO.userDTO);
         this.companyName = infoCompanyDTO.companyName;
-        this.companyPicture = infoCompanyDTO.companyPicture;
+        this.companyPictureUrl = infoCompanyDTO.companyPictureUrl;
         this.facebook = infoCompanyDTO.facebook;
         this.instagram = infoCompanyDTO.instagram;
         this.webPage = infoCompanyDTO.webPage;
