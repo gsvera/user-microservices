@@ -15,7 +15,6 @@ import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +39,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final MailService mailService;
+    // private final MailService mailService;
+    private final SendMailService sendMailService;
     private final ResetTokenService resetTokenService;
     private final CatalogPlanRepository catalogPlanRepository;
     private final UserPlanRepository userPlanRepository;
@@ -284,7 +284,7 @@ public class UserService {
                     "<body>\n" +
                     "    <div class=\"card-form-white-pink card-password\">\n" +
                     "        <div class=\"\">\n" +
-                    "            <h5>Verificación de creación de cuenta MeCare</h5>\n" +
+                    "            <h5>Verificación de creación de cuenta Meredith Aesthetic</h5>\n" +
                     "            <div style=\"\">\n" +
                     "               <p>Da click en el siguiente botón para verificar tu nueva cuenta MeCare</p>\n" +
                     "               <div class=\"content-btn\">" +
@@ -295,7 +295,7 @@ public class UserService {
                     "    </div>\n" +
                     "</body>\n" +
                     "</html>";
-            mailService.SendEmail(email, "Verificación de cuenta MeCare", htmlBody);
+            sendMailService.sendEmail(email, "Verificación de cuenta Meredith Aesthetic", htmlBody);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -348,14 +348,13 @@ public class UserService {
                         "        <div class=\"\">\n" +
                         "            <h5>Nuevo código  de verificación</h5>\n" +
                         "            <div style=\"display: flex; justify-content: center\">\n" +
-                        "               <p >Tu código  de verificación de MeCare es: <span style=\"font-weight: fold\"> "+codigo+"</span>. No lo compartas con nadie.</p>\n" +
+                        "               <p >Tu código  de verificación de Meredith Aesthetic es: <span style=\"font-weight: fold\"> "+codigo+"</span>. No lo compartas con nadie.</p>\n" +
                         "            </div>\n" +
                         "        </div>\n" +
                         "    </div>\n" +
                         "</body>\n" +
                         "</html>";
-
-                mailService.SendEmail(user.get().getEmail(), "MeCare código  de verificación", htmlBody);
+                sendMailService.sendEmail(user.get().getEmail(), "Meredith Aesthetic código  de verificación", htmlBody);
                 return ResponseDTO.builder().message("Se ha enviado el codigo de verificación a su cuenta de correo").build();
             }
         } catch (Exception ex) {
