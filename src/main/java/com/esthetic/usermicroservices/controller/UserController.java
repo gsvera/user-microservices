@@ -110,7 +110,7 @@ public class UserController {
                     "<body>\n" +
                     "    <div class=\"card\">\n" +
                     "        <div class=\"content-logo\">\n" +
-                    "            <img class=\"img-logo\" src=\""+envConfig.getApiGateway()+"/meraesthetic-logo.png\"/>\n" +
+                    "            <img class=\"img-logo\" src=\""+envConfig.getHostname()+"/meredith-aesthetic-logo-icon.png\"/>\n" +
                     "        </div>\n" +
                     "        <h4 class=\"text\">"+responseDTO.message+"</h4>\n" +
                     "    </div>\n" +

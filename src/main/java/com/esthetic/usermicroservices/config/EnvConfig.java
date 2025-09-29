@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 public class EnvConfig {
     @Value("${my.property.api.gateway}")
     private String apiGateway;
+    @Value("${url.hostname}")
+    private String hostname;
     // ENV DE SPACE IMAGE DIGITAL OCEAN
     @Value("${cloud.aws.se.bucket}")
     private String s3Bucket;

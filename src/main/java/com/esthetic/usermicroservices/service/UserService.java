@@ -288,7 +288,7 @@ public class UserService {
                     "            <div style=\"\">\n" +
                     "               <p>Da click en el siguiente botón para verificar tu nueva cuenta MeCare</p>\n" +
                     "               <div class=\"content-btn\">" +
-                    "                   <a class=\"btn-success\" href=\""+envConfig.getApiGateway()+"/api/esthetic/user/account-verification?account="+idUser+"\">Verificar cuenta</a> \n"+
+                    "                   <a class=\"btn-success\" href=\""+envConfig.getHostname()+"/api/esthetic/user/account-verification?account="+idUser+"\">Verificar cuenta</a> \n"+
                     "               </div>" +
                     "            </div>\n" +
                     "        </div>\n" +
