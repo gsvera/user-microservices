@@ -18,6 +18,7 @@ public class CouponRedemption {
     private Long paymentId;
     @Column(name = "redeemde_at")
     private Timestamp redeemdeAt = Timestamp.from(Instant.now());
+    public CouponRedemption () {}; // default constructor
     public CouponRedemption(String idUser, Long couponId, Long paymentId) {
         this.idUser = idUser;
         this.couponId = couponId;

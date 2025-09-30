@@ -14,10 +14,9 @@ public class CouponController {
     @Autowired
     private CouponService couponService;
     @GetMapping("/get-coupon")
-    public ResponseDTO GetCoupon(@RequestParam(name = "code") String code) {
+    public ResponseDTO GetCoupon(@RequestParam(name = "code") String code, @RequestParam(name = "id-user", required = false) String idUser) {
         try{
-            System.out.println(code);
-            return couponService._GetCoupon(code);
+            return couponService._GetCoupon(code, idUser);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
