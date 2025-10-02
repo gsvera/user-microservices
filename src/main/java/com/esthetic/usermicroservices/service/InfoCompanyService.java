@@ -8,9 +8,9 @@ import com.esthetic.usermicroservices.repository.UserRepository;
 import com.esthetic.usermicroservices.utils.ApiHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class InfoCompanyService {
     @Autowired
     private EnvConfig envConfig;
     public ResponseDTO _GetProviderAvailable(int page, int size, String typeService, String word, String defaultState, String defaultMunicipality) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.unsorted());
         Page<Object[]> listProvider = null;
         if(typeService != null && !typeService.isEmpty()){
             Integer[] arrayTypeService = Arrays.stream(typeService.split(","))

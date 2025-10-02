@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> {
     @Query(value = "SELECT * FROM tbl_info_company WHERE id_user = ?1", nativeQuery = true)
     Optional<InfoCompany> findByIdUser(String idUser);
-    @Query(value = "SELECT \n" +
+    @Query(value = "SELECT * FROM ( SELECT \n" +
             "DISTINCT(u.id), \n" +
             "ic.id, \n" +
             "ic.company_name, \n" +
@@ -37,7 +37,7 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
             "      WHERE tsu2.id_user = u.id \n" +
             "  )\n" +
             "AND (SELECT t.is_active FROM tbl_user_plan t WHERE id_user = u.id AND is_active = true LIMIT 1) \n" +
-            "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality;",
+            "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality ) sub ORDER BY RANDOM();",
             countQuery = "SELECT COUNT(DISTINCT u.id) FROM tbl_user u " +
                     "JOIN tbl_info_company ic ON ic.id_user = u.id " +
                     "JOIN tbl_user_location ul ON u.id = ul.id_user " +
@@ -48,7 +48,7 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
             nativeQuery = true)
     Page<Object[]> getProvider(String word, String defaultState, String defaultMunicipality, Pageable pageable);
 
-@Query(value = "SELECT DISTINCT(u.id), ic.id, ic.company_name, ic.general_description, ic.company_picture_url, " +
+@Query(value = "SELECT * FROM ( SELECT DISTINCT(u.id), ic.id, ic.company_name, ic.general_description, ic.company_picture_url, " +
         "STRING_AGG(ts.type_service_name_es, ','), " +
         "ul.aux_state, " +
         "ul.aux_municipality, " +
@@ -68,7 +68,7 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
         "    AND tsu2.id_type_service = ANY(CAST(:types AS int[]))" +
         ")) " +
         "AND (SELECT t.is_active FROM tbl_user_plan t WHERE id_user = u.id AND is_active = true LIMIT 1) " +
-        "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality ",
+        "GROUP BY u.id, ic.id, ul.aux_state, ul.aux_municipality) sub ORDER BY RANDOM() ",
         countQuery = "SELECT COUNT(*) FROM tbl_user AS u " +
                 "JOIN tbl_type_service_x_user AS tsu ON tsu.id_user = u.id " +
                 "JOIN tbl_catalog_type_service AS ts ON tsu.id_type_service = ts.id " +
