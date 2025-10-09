@@ -144,8 +144,8 @@ public class UserConfigService {
         }
         return ResponseDTO.builder().message("No se encontro el usuario").build();
     }
-    public ResponseDTO _GetCurrentVersion() {
-        Optional<ConfigAppMobile> configAppMobile = configAppMobileRepository.getConfigApp();
+    public ResponseDTO _GetCurrentVersion(String slugName) {
+        Optional<ConfigAppMobile> configAppMobile = configAppMobileRepository.getConfigApp(slugName);
         if(configAppMobile.isPresent()) {
             return ResponseDTO.builder().items(new ConfigAppMobileDTO(configAppMobile.get())).build();
         } else {

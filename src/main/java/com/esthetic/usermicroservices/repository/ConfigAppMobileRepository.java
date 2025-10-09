@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface ConfigAppMobileRepository extends JpaRepository<ConfigAppMobile, Long> {
-    @Query(value = "SELECT * FROM tbl_config_app_mobile ORDER BY id ASC LIMIT 1", nativeQuery = true)
-    Optional<ConfigAppMobile> getConfigApp();
+    @Query(value = "SELECT * FROM tbl_config_app_mobile WHERE slug_name = ?1 LIMIT 1", nativeQuery = true)
+    Optional<ConfigAppMobile> getConfigApp(String slugName);
 }

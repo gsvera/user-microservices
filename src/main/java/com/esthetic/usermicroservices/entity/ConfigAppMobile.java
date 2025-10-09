@@ -13,4 +13,6 @@ public class ConfigAppMobile {
     private String versionAndroid;
     @Column(name = "version_ios")
     private String versionIos;
+    @Column(name = "slug_name")
+    private String slugName;
 }

@@ -200,9 +200,9 @@ public class UserController {
         }
     }
     @GetMapping("/get-current-version")
-    public ResponseDTO GetCurrentVersion(){
+    public ResponseDTO GetCurrentVersion(@RequestParam(name = "slug-name") String slugName){
         try{
-            return userConfigService._GetCurrentVersion();
+            return userConfigService._GetCurrentVersion(slugName);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
