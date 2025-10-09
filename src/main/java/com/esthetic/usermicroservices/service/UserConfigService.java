@@ -2,10 +2,7 @@ package com.esthetic.usermicroservices.service;
 
 import com.esthetic.usermicroservices.config.EnvConfig;
 import com.esthetic.usermicroservices.dto.*;
-import com.esthetic.usermicroservices.entity.InfoCompany;
-import com.esthetic.usermicroservices.entity.Training;
-import com.esthetic.usermicroservices.entity.User;
-import com.esthetic.usermicroservices.entity.UserLocation;
+import com.esthetic.usermicroservices.entity.*;
 import com.esthetic.usermicroservices.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +22,7 @@ public class UserConfigService {
     private final TrainingRepository trainingRepository;
     private final SpaceService spaceService;
     private final EnvConfig envConfig;
+    private final ConfigAppMobileRepository configAppMobileRepository;
     public ResponseDTO _GetTraining() {
         List<Training> trainingList = trainingRepository.findAll();
         return ResponseDTO.builder().items(trainingList.stream().map(item -> new TrainingDTO(item)).collect(Collectors.toList())).build();
@@ -145,5 +143,13 @@ public class UserConfigService {
             return ResponseDTO.builder().message("Token de notificaciones push guardado con éxito").build();
         }
         return ResponseDTO.builder().message("No se encontro el usuario").build();
+    }
+    public ResponseDTO _GetCurrentVersion() {
+        Optional<ConfigAppMobile> configAppMobile = configAppMobileRepository.getConfigApp();
+        if(configAppMobile.isPresent()) {
+            return ResponseDTO.builder().items(new ConfigAppMobileDTO(configAppMobile.get())).build();
+        } else {
+            return ResponseDTO.builder().error(true).message("No se encontro el registro").build();
+        }
     }
 }

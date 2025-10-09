@@ -7,6 +7,7 @@ import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
 import com.esthetic.usermicroservices.service.InfoCompanyService;
 import com.esthetic.usermicroservices.service.StripeService;
+import com.esthetic.usermicroservices.service.UserConfigService;
 import com.esthetic.usermicroservices.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,8 @@ public class UserController {
     private StripeService stripeService;
     @Autowired
     public EnvConfig envConfig;
+    @Autowired
+    private UserConfigService userConfigService;
 
     @GetMapping("/prueba")
     public ResponseDTO prueba () {return ResponseDTO.builder().message("Prueba de alcance").build();}
@@ -191,6 +194,15 @@ public class UserController {
             String name = (String)body.get("name");
 
             return stripeService._MakeOrder(amount, email, name);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @GetMapping("/get-current-version")
+    public ResponseDTO GetCurrentVersion(){
+        try{
+            return userConfigService._GetCurrentVersion();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
