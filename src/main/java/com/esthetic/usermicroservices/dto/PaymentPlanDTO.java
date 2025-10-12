@@ -16,4 +16,5 @@ public class PaymentPlanDTO {
     public String customerStripe;
     public String paymentIntentStripe;
     public String ephemeralKeyStripe;
+    public String namePlan;
 }

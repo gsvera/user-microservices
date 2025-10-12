@@ -23,6 +23,7 @@ public class UserConfigService {
     private final SpaceService spaceService;
     private final EnvConfig envConfig;
     private final ConfigAppMobileRepository configAppMobileRepository;
+    private final PaymentService paymentService;
     public ResponseDTO _GetTraining() {
         List<Training> trainingList = trainingRepository.findAll();
         return ResponseDTO.builder().items(trainingList.stream().map(item -> new TrainingDTO(item)).collect(Collectors.toList())).build();
@@ -58,6 +59,10 @@ public class UserConfigService {
         return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
     }
     public ResponseDTO _SaveUserLocation(UserLocationDTO userLocationDTO) {
+        ResponseDTO responseDTO = paymentService._GetProviderIsActive(userLocationDTO.getIdUser());
+        if(responseDTO.error) {
+            return responseDTO;
+        }
         Optional<UserLocation> userLocation = userLocationRepository.findByIdUser(userLocationDTO.getIdUser());
         if(userLocation.isPresent()) {
             userLocation.orElseThrow().setLatitude(userLocationDTO.getLatitude());
@@ -99,6 +104,10 @@ public class UserConfigService {
     }
     public ResponseDTO _GetMyCurrentPlan(String idUser) {
         Optional<UserPlanDTO> userPlanDTO = userPlanRepository.findByIdUserOrderByStartDateASC(idUser).stream().findFirst();
+        if(!userPlanDTO.isPresent()) {
+            Optional<UserPlanDTO> userPlanLast = userPlanRepository.findLastUserPlan(idUser).stream().findFirst();
+            return ResponseDTO.builder().items(userPlanLast.get()).build();
+        }
         return ResponseDTO.builder().items(userPlanDTO.get()).build();
     }
     public ResponseDTO _DeleteLocationByUser(String idUser) {
@@ -110,6 +119,10 @@ public class UserConfigService {
         return ResponseDTO.builder().items(new InfoCompanyDTO(infoCompany.get())).build();
     }
     public ResponseDTO _UpdateInfoCompany(InfoCompanyDTO infoCompanyDTO, MultipartFile file) throws IOException{
+        ResponseDTO responseDTO = paymentService._GetProviderIsActive(infoCompanyDTO.idUser);
+        if(responseDTO.error){
+            return responseDTO;
+        }
         Optional<InfoCompany> infoCompany = infoCompanyRepository.findByIdUser(infoCompanyDTO.idUser);
         String fileName = envConfig.getDirInfoCompany() +"/"+ file.getOriginalFilename();
 

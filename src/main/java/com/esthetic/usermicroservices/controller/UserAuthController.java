@@ -3,6 +3,7 @@ package com.esthetic.usermicroservices.controller;
 import com.esthetic.usermicroservices.dto.PaymentPlanDTO;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
+import com.esthetic.usermicroservices.service.PaymentService;
 import com.esthetic.usermicroservices.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserAuthController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private PaymentService paymentService;
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO GetUserById(@PathVariable("id") Long id) {
@@ -116,6 +119,24 @@ public class UserAuthController {
         try{
             return  userService._SavePayStripe(paymentPlanDTO);
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @GetMapping("/get-provider-is-active/{id-provider}")
+    public ResponseDTO GetProviderIsActive(@PathVariable(name = "id-provider") String idProvider) {
+        try{
+            return paymentService._GetProviderIsActive(idProvider);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @GetMapping("/get-history-pay/{id-provider}")
+    public ResponseDTO GetHistoryPay(@PathVariable(name = "id-provider") String idProvider){
+        try{
+            return  paymentService._GetHistoryPay(idProvider);
+        } catch (Exception ex){
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
