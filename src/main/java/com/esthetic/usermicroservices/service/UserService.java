@@ -3,12 +3,8 @@ package com.esthetic.usermicroservices.service;
 import com.esthetic.usermicroservices.clases.RequestTokenReset;
 import com.esthetic.usermicroservices.config.EnvConfig;
 import com.esthetic.usermicroservices.dto.*;
-import com.esthetic.usermicroservices.entity.CatalogPlan;
-import com.esthetic.usermicroservices.entity.ResetToken;
-import com.esthetic.usermicroservices.entity.UserPlan;
-import com.esthetic.usermicroservices.repository.CatalogPlanRepository;
-import com.esthetic.usermicroservices.repository.InfoCompanyRepository;
-import com.esthetic.usermicroservices.repository.UserPlanRepository;
+import com.esthetic.usermicroservices.entity.*;
+import com.esthetic.usermicroservices.repository.*;
 import com.esthetic.usermicroservices.utils.ApiHelper;
 import com.esthetic.usermicroservices.utils.EncrypDecrypCode;
 import com.google.gson.Gson;
@@ -28,8 +24,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import com.esthetic.usermicroservices.repository.UserRepository;
-import com.esthetic.usermicroservices.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,7 +33,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    // private final MailService mailService;
     private final SendMailService sendMailService;
     private final ResetTokenService resetTokenService;
     private final CatalogPlanRepository catalogPlanRepository;
@@ -48,7 +41,7 @@ public class UserService {
     private final ApiHelper apiHelper;
     private final UserConfigService userConfigService;
     private final InfoCompanyRepository infoCompanyRepository;
-
+    private final FavoriteProviderRepository favoriteProviderRepository;
     @Autowired
     public EnvConfig envConfig;
 
@@ -518,5 +511,17 @@ public class UserService {
                 false
         );
         userPlanRepository.save(userPlan);
+    }
+    public ResponseDTO _GetFavoritesKeysProvider(String idClient) {
+         List<String> listKeys = favoriteProviderRepository.findKeysFavoriteProvider(idClient);
+         return ResponseDTO.builder().items(listKeys).build();
+    }
+    public ResponseDTO _SaveFavoriteProvider(FavoriteProviderDTO favoriteProviderDTO){
+        favoriteProviderRepository.save(new FavoriteProvider(favoriteProviderDTO));
+        return ResponseDTO.builder().message("Se guardo en mis favoritos").build();
+    }
+    public ResponseDTO _DeleteFavoriteProvider(FavoriteProviderDTO favoriteProviderDTO) {
+        favoriteProviderRepository.deleteFavoriteProviderByClient(favoriteProviderDTO.idClient, favoriteProviderDTO.idProvider);
+        return ResponseDTO.builder().message("Se elimino de mis favoritos").build();
     }
 }

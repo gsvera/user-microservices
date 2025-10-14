@@ -59,6 +59,29 @@ public class InfoCompanyService {
 
         return ResponseDTO.builder().items(pageDTO).build();
     }
+    public ResponseDTO _FindMyFavoriteProvider(int page, int size, String idClient) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.unsorted());
+        Page<Object[]> listProvider = infoCompanyRepository.getMyFavoritesProviders(idClient, pageRequest);
+        List<InfoCompanyDTO> listUserDto = new ArrayList<>();
+        for(Object[] item : listProvider) {
+            InfoCompanyDTO infoCompanyDTO = new InfoCompanyDTO();
+            infoCompanyDTO.id = (Long) item[0];
+            infoCompanyDTO.idUser = (String)item[1];
+            infoCompanyDTO.companyName = (String) item[2];
+            infoCompanyDTO.generalDescription = (String) item[3];
+            infoCompanyDTO.companyPictureUrl = (String)item[4];
+            infoCompanyDTO.typesServices = (String) item[5];
+            infoCompanyDTO.auxState = (String) item[6];
+            infoCompanyDTO.auxMunicipality = (String) item[7];
+            BigDecimal avgRating = (BigDecimal) item[8];
+            infoCompanyDTO.auxRating = avgRating == null ? 0 : avgRating.doubleValue();
+            listUserDto.add(infoCompanyDTO);
+        }
+        PageDTO pageDTO = new PageDTO(listProvider);
+        pageDTO.items = listUserDto;
+
+        return ResponseDTO.builder().items(pageDTO).build();
+    }
     public ResponseDTO _GetProvidedrById(String idUser) {
         String api = envConfig.getApiGateway() + "/api/esthetic/catalog-type-service/get-types-by-user/"+idUser;
         HttpHeaders headers = new HttpHeaders();

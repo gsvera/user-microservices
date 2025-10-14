@@ -1,8 +1,10 @@
 package com.esthetic.usermicroservices.controller;
 
+import com.esthetic.usermicroservices.dto.FavoriteProviderDTO;
 import com.esthetic.usermicroservices.dto.PaymentPlanDTO;
 import com.esthetic.usermicroservices.dto.ResponseDTO;
 import com.esthetic.usermicroservices.dto.UserDTO;
+import com.esthetic.usermicroservices.service.InfoCompanyService;
 import com.esthetic.usermicroservices.service.PaymentService;
 import com.esthetic.usermicroservices.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ public class UserAuthController {
     private UserService userService;
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private InfoCompanyService infoCompanyService;
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO GetUserById(@PathVariable("id") Long id) {
@@ -135,8 +139,46 @@ public class UserAuthController {
     @GetMapping("/get-history-pay/{id-provider}")
     public ResponseDTO GetHistoryPay(@PathVariable(name = "id-provider") String idProvider){
         try{
-            return  paymentService._GetHistoryPay(idProvider);
+            return paymentService._GetHistoryPay(idProvider);
         } catch (Exception ex){
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @PostMapping("/save-favorite-provider")
+    public ResponseDTO SaveFavoriteProvider(@RequestBody FavoriteProviderDTO favoriteProviderDTO) {
+        try{
+            return userService._SaveFavoriteProvider(favoriteProviderDTO);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @DeleteMapping("/delete-favorite-provider")
+    public ResponseDTO DeleteFavoriteProvider(@RequestBody FavoriteProviderDTO favoriteProviderDTO) {
+        try{
+            return userService._DeleteFavoriteProvider(favoriteProviderDTO);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @GetMapping("/get-keys-favorites-providers/{id-client}")
+    public ResponseDTO GetKeysFavoritesProvider(@PathVariable(name = "id-client") String idClient) {
+        try{
+            return userService._GetFavoritesKeysProvider(idClient);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @GetMapping("/get-my-favorites-providers")
+    public ResponseDTO GetMyFavoritesProvider(@RequestParam(defaultValue = "0") int page,
+                                              @RequestParam(defaultValue = "10") int size,
+                                              @RequestParam String idClient) {
+        try{
+            return infoCompanyService._FindMyFavoriteProvider(page, size, idClient);
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }

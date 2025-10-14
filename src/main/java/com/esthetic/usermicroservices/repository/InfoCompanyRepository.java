@@ -84,10 +84,43 @@ public interface InfoCompanyRepository extends JpaRepository<InfoCompany, Long> 
                 "    AND tsu2.id_type_service = ANY(CAST(:types AS int[]))" +
                 "))",
         nativeQuery = true)
-Page<Object[]> getProviderByTypeServices(@Param("word") String word, @Param("defaultState") String defaultState, @Param("defaultMunicipality") String defaultMunicipality, @Param("types") Integer[] typeService, Pageable pageable);
+    Page<Object[]> getProviderByTypeServices(@Param("word") String word, @Param("defaultState") String defaultState, @Param("defaultMunicipality") String defaultMunicipality, @Param("types") Integer[] typeService, Pageable pageable);
 
     @Modifying
     @Transactional
     @Query("DELETE FROM InfoCompany WHERE user.id = ?1")
     void deleteInfoCompany(String idProvider);
+
+    @Query(value =
+            "SELECT fp.id, " +
+            "fp.id_provider, " +
+            "i.company_name, " +
+            "i.general_description, " +
+            "i.company_picture_url, " +
+            "STRING_AGG(cts.type_service_name_es, ',') AS services, " +
+            "ul.aux_state, " +
+            "ul.aux_municipality, " +
+            "(SELECT ROUND(AVG(rating), 1) " +
+            " FROM tbl_provider_ratings " +
+            " WHERE id_provider = fp.id_provider " +
+            " AND is_pending = false AND show = true) AS rating " +
+            "FROM tbl_favorite_provider fp " +
+            "JOIN tbl_user u ON u.id = fp.id_provider " +
+            "JOIN tbl_info_company i ON fp.id_provider = i.id_user " +
+            "JOIN tbl_type_service_x_user tsu ON tsu.id_user = fp.id_provider " +
+            "JOIN tbl_catalog_type_service cts ON cts.id = tsu.id_type_service " +
+            "JOIN tbl_user_location ul ON ul.id_user = fp.id_provider " +
+            "WHERE fp.id_client = ?1 " +
+            "AND u.is_provider = true " +
+            "AND u.active_provider = true " +
+            "AND EXISTS (SELECT 1 FROM tbl_user_plan up WHERE up.id_user = fp.id_provider AND up.is_active = true) " +
+            "GROUP BY fp.id, i.company_name, i.general_description, i.company_picture_url, ul.aux_state, ul.aux_municipality ",
+            countQuery = "SELECT COUNT(*) " +
+                    "FROM tbl_favorite_provider fp " +
+                    "JOIN tbl_user u ON u.id = fp.id_provider " +
+                    "WHERE fp.id_client = ?1 " +
+                    "AND u.is_provider = true " +
+                    "AND u.active_provider = true " +
+                    "AND EXISTS (SELECT 1 FROM tbl_user_plan up WHERE up.id_user = fp.id_provider AND up.is_active = true)", nativeQuery = true)
+    Page<Object[]> getMyFavoritesProviders(String idClient, Pageable pageable);
 }

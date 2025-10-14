@@ -30,9 +30,6 @@ public class UserController {
     @Autowired
     private UserConfigService userConfigService;
 
-    @GetMapping("/prueba")
-    public ResponseDTO prueba () {return ResponseDTO.builder().message("Prueba de alcance").build();}
-
     @GetMapping("/find-duplicated-user")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO findDuplicatedUser(@RequestParam String email, @RequestParam String phone) {
