@@ -11,6 +11,8 @@ public class EnvConfig {
     private String apiGateway;
     @Value("${url.hostname}")
     private String hostname;
+    @Value("${env.exponotificationurl}")
+    private String expoNotificationUrl;
     // ENV DE SPACE IMAGE DIGITAL OCEAN
     @Value("${cloud.aws.se.bucket}")
     private String s3Bucket;

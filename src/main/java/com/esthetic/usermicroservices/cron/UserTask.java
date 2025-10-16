@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserTask {
     @Autowired
     private UserService userService;
-
-    @Scheduled(fixedDelay = 3600000) // Se ejecuta cada hora
+    //12 horas × 60 min × 60 seg × 1000 ms = 43,200,000 ms
+    @Scheduled(fixedDelay = 86400000) // Se ejecuta cada dia
     @Transactional
     public void ExectuteDeleteUserInvalid() {
         try{
@@ -20,8 +20,16 @@ public class UserTask {
             System.out.println(ex.getMessage());
         }
     }
-
-    @Scheduled(fixedDelay = 3600000)
+    @Scheduled(fixedDelay = 86400000) // Se ejecuta cada dia
+    @Transactional
+    public void ExecutePrevNotificationToEndPlan(){
+        try{
+            userService._SendNotificationToPrevEndPlan();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    @Scheduled(fixedDelay = 43200000) // Se ejecuta cada 12 horas
     @Transactional
     public void ExecuteEnabledProvider() {
         try{

@@ -24,6 +24,10 @@ public interface UserPlanRepository extends JpaRepository<UserPlan, Long> {
     void deleteAllPlanByUser(String idUser);
     @Query(value = "SELECT p FROM UserPlan p WHERE isActive = true AND endDate < ?1")
     List<UserPlan> listPlanExpired(Instant today);
+    @Query("SELECT p FROM UserPlan p " +
+            "WHERE p.isActive = true " +
+            "AND p.endDate BETWEEN ?1 AND ?2")
+    List<UserPlan> findPlansEndingTomorrow(Instant startOfTomorrow, Instant endOfTomorrow);
     @Modifying
     @Transactional
     @Query("UPDATE UserPlan SET isUsed = true WHERE idUser = ?1 AND isUsed = false AND endDate < ?2")

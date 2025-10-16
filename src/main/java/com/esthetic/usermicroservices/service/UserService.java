@@ -19,9 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.*;
 
 import org.springframework.stereotype.Service;
@@ -42,6 +40,7 @@ public class UserService {
     private final UserConfigService userConfigService;
     private final InfoCompanyRepository infoCompanyRepository;
     private final FavoriteProviderRepository favoriteProviderRepository;
+    private final PushNotificationService pushNotificationService;
     @Autowired
     public EnvConfig envConfig;
 
@@ -412,7 +411,27 @@ public class UserService {
             }
         }
     }
+    public void _SendNotificationToPrevEndPlan() {
+        Instant startOfTomorrow = LocalDate.now(ZoneOffset.UTC)
+                .plusDays(1)
+                .atStartOfDay()
+                .toInstant(ZoneOffset.UTC);
 
+        Instant endOfTomorrow = LocalDate.now(ZoneOffset.UTC)
+                .plusDays(1)
+                .atTime(LocalTime.MAX)
+                .toInstant(ZoneOffset.UTC);
+        List<UserPlan> lisUserPlan = userPlanRepository.findPlansEndingTomorrow(startOfTomorrow, endOfTomorrow);
+
+        for(UserPlan up: lisUserPlan) {
+            Optional<User> user = userRepository.findById(up.getIdUser());
+            if(user.isPresent()) {
+                if(user.get().getTokenNotification() != null && !user.get().getTokenNotification().equals("")) {
+                    pushNotificationService.sendPushNotification(user.get().getTokenNotification(), "Recordatorio de pago", "Tu suscripción en Meredith Aesthetic esta por vencer. Realiza tu pago para seguir disfrutando de todas las funcionalidades de la app." );
+                }
+            }
+        }
+    }
     public void _DisableProviderByEndPlan() {
         Instant today = Instant.now();
         List<UserPlan> userPlanList = userPlanRepository.listPlanExpired(today);
