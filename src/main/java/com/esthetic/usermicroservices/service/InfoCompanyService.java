@@ -28,7 +28,7 @@ public class InfoCompanyService {
     @Autowired
     private EnvConfig envConfig;
     public ResponseDTO _GetProviderAvailable(int page, int size, String typeService, String word, String defaultState, String defaultMunicipality) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.unsorted());
+        PageRequest pageRequest = PageRequest.of(page, size);
         Page<Object[]> listProvider = null;
         if(typeService != null && !typeService.isEmpty()){
             Integer[] arrayTypeService = Arrays.stream(typeService.split(","))

@@ -205,4 +205,13 @@ public class UserController {
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
         }
     }
+    @GetMapping("/get-location-by-provider")
+    public ResponseDTO getLocationByUser(@RequestParam(name = "id-user") String idUser) {
+        try{
+            return userConfigService._GetLocationByUser(idUser);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
 }
