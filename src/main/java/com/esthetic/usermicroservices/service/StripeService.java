@@ -1,34 +1,43 @@
 package com.esthetic.usermicroservices.service;
 
-import com.esthetic.usermicroservices.dto.ResponseDTO;
+import com.esthetic.usermicroservices.config.EnvConfig;
+import com.esthetic.usermicroservices.dto.*;
+import com.esthetic.usermicroservices.entity.PendingUser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.EphemeralKey;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.checkout.Session;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.checkout.SessionCreateParams;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class StripeService {
-    @Value("${stripe.publickey}")
-    public String publickKey;
-    @Value("${stripe.secretkey}")
-    public String secretKey;
 
+    private final EnvConfig envConfig;
+    private final PendingUserService pendingUserService;
+    private final UserService userService;
+
+    // Esta funcion es para mobile
     public ResponseDTO _GetClientIdStripe(){
-        return ResponseDTO.builder().items(publickKey).build();
+        return ResponseDTO.builder().items(envConfig.getPublickStripeKey()).build();
     }
+
+    // Esta funcion es para mobile
     public ResponseDTO _MakeOrder(Long amount, String email, String name) throws StripeException {
-        Stripe.apiKey = secretKey;
+        Stripe.apiKey = envConfig.getSecretStripeKey();
         Long amountCents = amount * 100;
 
         CustomerCreateParams customerParams = CustomerCreateParams.builder().setEmail(email).setName(name).build();
@@ -61,8 +70,102 @@ public class StripeService {
         responseData.put("ephemeralKey", ephemeralKey.getSecret());
 
         responseData.put("customer", customer.getId());
-        responseData.put("publishableKey", publickKey);
+        responseData.put("publishableKey", envConfig.getPublickStripeKey());
         return ResponseDTO.builder().items(responseData).build();
     }
 
+    // Esta funcion es para web
+    public ResponseDTO _CreateCheckoutSession (CheckoutStripeParamsDTO checkoutStripeParamsDTO) throws StripeException {
+        try{
+            Stripe.apiKey = envConfig.getSecretStripeKey();
+            Long amountCents = checkoutStripeParamsDTO.amount * 100;
+
+            CustomerCreateParams customerParams = CustomerCreateParams.builder()
+                    .setEmail(checkoutStripeParamsDTO.email)
+                    .setName(checkoutStripeParamsDTO.name)
+                    .build();
+            Customer customer = Customer.create(customerParams);
+
+            // Crear sesión de checkout
+            SessionCreateParams params = SessionCreateParams.builder()
+                    .setMode(SessionCreateParams.Mode.PAYMENT)
+                    .setCustomer(customer.getId())
+                    .setSuccessUrl(envConfig.getHostname() + "/gracias?sessionId={CHECKOUT_SESSION_ID}")
+                    .setCancelUrl(envConfig.getHostname() + "/cancelado")
+                    .addLineItem(
+                            SessionCreateParams.LineItem.builder()
+                                    .setQuantity(1L)
+                                    .setPriceData(
+                                            SessionCreateParams.LineItem.PriceData.builder()
+                                                    .setCurrency("mxn")
+                                                    .setUnitAmount(amountCents)
+                                                    .setProductData(
+                                                            SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                    .setName("Suscripción mensual Meredith Aesthetic")
+                                                                    .build()
+                                                    )
+                                                    .build()
+                                    )
+                                    .build()
+                    )
+                    .build();
+
+            Session session = Session.create(params);
+
+            // Guardar como temporal
+            pendingUserService._CreatePendingUser(session.getId(), checkoutStripeParamsDTO);
+
+            Map<String, Object> res = new HashMap<>();
+            res.put("checkoutUrl", session.getUrl());
+            res.put("sessionId", session.getId());
+            return ResponseDTO.builder().items(res).build();
+
+        } catch (StripeException ex) {
+
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo más tarde").build();
+        }
+
+    }
+    public ResponseDTO _VerifyPayment(String sessionId) {
+        Stripe.apiKey = envConfig.getSecretStripeKey();
+
+        try {
+            Session session = Session.retrieve(sessionId);
+
+            if ("complete".equals(session.getStatus())
+                    && "paid".equals(session.getPaymentStatus())) {
+
+                Optional<PendingUser> pending = pendingUserService._GetBySessionIdObject(sessionId);
+
+                if(pending.isPresent() && pending.get().getStatusPayment().equals("pending")) {
+                    String sessionCustomer = session.getCustomer();
+                    String sessionPaymentIntent = session.getPaymentIntent();
+                    if(pending.get().getUserId() != null) {
+                        ObjectMapper mapper = new ObjectMapper();
+                        mapper.registerModule(new JavaTimeModule());
+                        PaymentPlanDTO paymentPlanDTO = mapper.readValue(pending.get().getFormDataJson(), PaymentPlanDTO.class);
+                        paymentPlanDTO.customerStripe = sessionCustomer;
+                        paymentPlanDTO.paymentIntentStripe = sessionPaymentIntent;
+                        userService._SavePayStripe(paymentPlanDTO);
+                    } else {
+                        ObjectMapper mapper = new ObjectMapper();
+                        mapper.registerModule(new JavaTimeModule());
+                        UserDTO userDTO = mapper.readValue(pending.get().getFormDataJson(), UserDTO.class);
+
+                        userDTO.paymentPlanDTO.customerStripe = sessionCustomer;
+                        userDTO.paymentPlanDTO.paymentIntentStripe = sessionPaymentIntent;
+
+                        userService._SaveUserStheticWork(userDTO);
+                    }
+                    pendingUserService._MarkCompleted(sessionId);
+                }
+                return ResponseDTO.builder().items(new PendingUserDTO(pending.get())).message("Se realizo el pago con éxito").build();
+            }
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return ResponseDTO.builder().error(true).build();
+    }
 }

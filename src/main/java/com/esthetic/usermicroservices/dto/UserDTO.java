@@ -1,6 +1,7 @@
 package com.esthetic.usermicroservices.dto;
 
 import com.esthetic.usermicroservices.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.time.Instant;
@@ -10,6 +11,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDTO {
     public String id;
     public String firstName;
@@ -84,6 +86,14 @@ public class UserDTO {
         this.accountVerification = user.getAccountVerification();
         this.createdAt = user.getCreatedAt();
         this.updatedAt = user.getUpdatedAt();
+    }
+    public UserDTO(String id,String firstName, String lastName, String email, String phone, String lada) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.lada = lada;
     }
     public Boolean _GetVerification() {
         return this.accountVerification;

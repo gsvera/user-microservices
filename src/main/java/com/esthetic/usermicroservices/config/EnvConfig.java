@@ -13,6 +13,13 @@ public class EnvConfig {
     private String hostname;
     @Value("${env.exponotificationurl}")
     private String expoNotificationUrl;
+
+    // ENV DE STRIPE
+    @Value("${stripe.publickey}")
+    private String publickStripeKey;
+    @Value("${stripe.secretkey}")
+    private String secretStripeKey;
+
     // ENV DE SPACE IMAGE DIGITAL OCEAN
     @Value("${cloud.aws.se.bucket}")
     private String s3Bucket;

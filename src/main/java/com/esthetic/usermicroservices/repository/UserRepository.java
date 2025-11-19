@@ -1,5 +1,6 @@
 package com.esthetic.usermicroservices.repository;
 
+import com.esthetic.usermicroservices.dto.UserDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -46,4 +47,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT u from User u WHERE isProvider = true")
     List<User> findUserProvider();
+    @Query(value = "SELECT new com.esthetic.usermicroservices.dto.UserDTO(u.id, u.firstName, u.lastName, u.email, u.phone, u.lada) FROM User u WHERE id = ?1")
+    Optional<UserDTO> findUserSimpleData(String idUser);
 }

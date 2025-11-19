@@ -82,7 +82,7 @@ public class InfoCompanyService {
 
         return ResponseDTO.builder().items(pageDTO).build();
     }
-    public ResponseDTO _GetProvidedrById(String idUser) {
+    public ResponseDTO _GetProviderById(String idUser) {
         String api = envConfig.getApiGateway() + "/api/esthetic/catalog-type-service/get-types-by-user/"+idUser;
         HttpHeaders headers = new HttpHeaders();
         HttpEntity httpEntity = new HttpEntity<>(headers);

@@ -2,19 +2,21 @@ package com.esthetic.usermicroservices.controller;
 
 import com.esthetic.usermicroservices.clases.RequestTokenReset;
 import com.esthetic.usermicroservices.config.EnvConfig;
-import com.esthetic.usermicroservices.dto.LoginRequestDTO;
-import com.esthetic.usermicroservices.dto.ResponseDTO;
-import com.esthetic.usermicroservices.dto.UserDTO;
-import com.esthetic.usermicroservices.service.InfoCompanyService;
-import com.esthetic.usermicroservices.service.StripeService;
-import com.esthetic.usermicroservices.service.UserConfigService;
-import com.esthetic.usermicroservices.service.UserService;
+import com.esthetic.usermicroservices.dto.*;
+import com.esthetic.usermicroservices.entity.PendingUser;
+import com.esthetic.usermicroservices.service.*;
+import com.google.gson.Gson;
+import com.stripe.model.Event;
+import com.stripe.model.checkout.Session;
+import com.stripe.net.Webhook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/esthetic/user")
@@ -29,6 +31,8 @@ public class UserController {
     public EnvConfig envConfig;
     @Autowired
     private UserConfigService userConfigService;
+    @Autowired
+    private PendingUserService pendingUserService;
 
     @GetMapping("/find-duplicated-user")
     @ResponseStatus(HttpStatus.OK)
@@ -167,7 +171,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO GetProviderById(@PathVariable(name = "id-user") String idUser) {
         try {
-            return  infoCompanyService._GetProvidedrById(idUser);
+            return  infoCompanyService._GetProviderById(idUser);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
@@ -176,7 +180,6 @@ public class UserController {
     @GetMapping("/get-client-id-stripe")
     public ResponseDTO GetClientIdStripe() {
         try{
-            System.out.println("entro");
             return stripeService._GetClientIdStripe();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -209,6 +212,51 @@ public class UserController {
     public ResponseDTO getLocationByUser(@RequestParam(name = "id-user") String idUser) {
         try{
             return userConfigService._GetLocationByUser(idUser);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @PostMapping("/create-checkout-session")
+    public ResponseDTO CreateCheckoutSession(@RequestBody CheckoutStripeParamsDTO checkoutStripeParamsDTO) {
+        try{
+            return stripeService._CreateCheckoutSession(checkoutStripeParamsDTO);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo más tarde").build();
+        }
+    }
+    @GetMapping("/verify-payment-stripe")
+    public ResponseDTO VerifyPaymentStripe(@RequestParam(name = "session-id") String sessionId) {
+        try{
+            return stripeService._VerifyPayment(sessionId);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @GetMapping("/get-my-current-plan/{id-user}")
+    public ResponseDTO GetMyCurrentPlan(@PathVariable("id-user") String idUser) {
+        try{
+            return userConfigService._GetMyCurrentPlan(idUser);
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @GetMapping("/get-simple-data-provider/{id-user}")
+    public ResponseDTO GetSimpleDataProvider(@PathVariable("id-user") String idUser) {
+        try{
+            return userService._GetSimpleDateProvider(idUser);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();
+        }
+    }
+    @PostMapping("/save-pay-stripe")
+    public ResponseDTO SavePayStripe(@RequestBody PaymentPlanDTO paymentPlanDTO) {
+        try{
+            return  userService._SavePayStripe(paymentPlanDTO);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return ResponseDTO.builder().error(true).message("Ocurrio un error intentelo mas tarde").build();

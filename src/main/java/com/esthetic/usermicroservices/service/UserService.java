@@ -83,6 +83,7 @@ public class UserService {
         paymentService._CreatePaymentPlan(paymentPlanDTO);
 
         this._makeUserPlan(Long.valueOf(objUser.getPlanSelect()), objUser.createdAt, newUser.getId());
+        this._SendWelcomeToMeredithAestheticWork(newUser.getEmail(), newUser.getFirstName()+ " " + newUser.getLastName());
 
         String token = jwtService.GetToken(newUser);
 
@@ -123,6 +124,8 @@ public class UserService {
         userRepository.updateTokenById(newUser.getId(), token);
 
         this._SendVerificationAccount(newUser.getEmail(), newUser.getId());
+        Thread.sleep(500); // <- solo para probar
+        this._SendWelcomeToMeredithAesthetic(newUser.getEmail(), newUser.getFirstName() + " " + newUser.getLastName());
 
         ResponseLoginDTO response = new ResponseLoginDTO(token, newUser);
 
@@ -235,7 +238,6 @@ public class UserService {
     }
     public void _SendVerificationAccount(String email, String idUser) throws MessagingException  {
         try {
-
             String htmlBody = "<!DOCTYPE html>\n" +
                     "<html lang=\"en\">\n" +
                     "<head>\n" +
@@ -353,6 +355,162 @@ public class UserService {
             System.out.println(ex.getMessage());
         }
         return ResponseDTO.builder().error(true).message("No se encontro el usuario").build();
+    }
+
+    public void _SendWelcomeToMeredithAesthetic(String email, String nameClient) throws MessagingException {
+        try {
+            String htmlBody = "<!DOCTYPE html>\n" +
+                    "                <html lang=\"en\">\n" +
+                    "                <head>\n" +
+                    "                    <meta charset=\"UTF-8\">\n" +
+                    "                    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                    "                    <title>MeCare</title>\n" +
+                    "                    <style>\n" +
+                    "                        @media(max-width: 520px) {\n" +
+                    "                            .card {\n" +
+                    "                                width: 90%;\n" +
+                    "                            }\n" +
+                    "                        }\n" +
+                    "                        @media(min-width: 520px) {\n" +
+                    "                            .card {\n" +
+                    "                                width: 50%;\n" +
+                    "                            }\n" +
+                    "                        }\n" +
+                    "                        .card {\n" +
+                    "                            border-radius: 10px;\n" +
+                    "                            margin: 0 auto;\n" +
+                    "                            padding: 20px;\n" +
+                    "                            box-shadow: 0 0 11px -3px rgba(0,0,0,0.8);\n" +
+                    "                        }\n" +
+                    "                        .text {\n" +
+                    "                            font-family:Arial, Helvetica, sans-serif ;\n" +
+                    "                            text-align: center;\n" +
+                    "                        }\n" +
+                    "                        .content-logo {\n" +
+                    "                            display: flex;\n" +
+                    "                            justify-content: center;;\n" +
+                    "                        }\n" +
+                    "                        .img-logo{\n" +
+                    "                            width: 200px;\n" +
+                    "                        }\n" +
+                    "                        .t-center {\n" +
+                    "                            text-align: center;\n" +
+                    "                        }\n" +
+                    "                        .t-justify {\n" +
+                    "                            text-align: justify;\n" +
+                    "                        }\n" +
+                    "                    </style>\n" +
+                    "                </head>\n" +
+                    "                <body>\n" +
+                    "                    <div class=\"card\">\n" +
+                    "                        <div class=\"content-logo\">\n" +
+                    "                            <img class=\"img-logo\" src=\"https://meredith-aesthetic.com/meredith-text-logo.png\"/>\n" +
+                    "                        </div>\n" +
+                    "                        <h4 class=\"text\">Bienvenido a Meredith Aesthetic</h4>\n" +
+                    "                        <p>\n" +
+                    "                            Hola " + nameClient + ",\n" +
+                    "                        </p>\n" +
+                    "                        <p>¡Gracias por registrarte en Meredith Aesthetic!</p>\n" +
+                    "                        <p class=\"t-justify\">Nos da mucho gusto darte la bienvenida a nuestra comunidad. A partir de hoy, tendrás acceso a una plataforma diseñada para brindarte una experiencia moderna, segura y personalizada en el mundo de la estética, la belleza y el bienestar.</p>\n" +
+                    "                        <p>En Meredith Aesthetic podrás:</p>\n" +
+                    "                        <ul>\n" +
+                    "                            <li>Encontrar a los mejores profesionales cerca de ti.</li>\n" +
+                    "                            <li>Revisar sus calificaciones, trabajos y recomendaciones.</li>\n" +
+                    "                            <li>Agendar tus citas de forma rápida, fácil y segura.</li>\n" +
+                    "                            <li>Disfrutar una experiencia pensada completamente para ti.</li>\n" +
+                    "                        </ul>\n" +
+                    "                        <p class=\"t-justify\">Estamos aquí para acompañarte en cada paso y asegurarnos de que tu experiencia sea siempre la mejor.</p>\n" +
+                    "                        <p class=\"t-justify\">Si tienes alguna duda o necesitas ayuda, nuestro equipo de soporte estará encantado de asistirte.</p>\n" +
+                    "                        <p class=\"t-center\">Gracias por confiar en nosotros</p>\n" +
+                    "                        <p class=\"t-center\">\n" +
+                    "                El equipo de Meredith Aesthetic\n" +
+                    "                        </p>\n" +
+                    "                    </div>\n" +
+                    "                </body>\n" +
+                    "                </html>";
+
+            sendMailService.sendEmail(email, "¡Bienvenido(a) a Meredith Aesthetic!", htmlBody);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public void _SendWelcomeToMeredithAestheticWork(String email, String nameClient) throws MessagingException {
+        try {
+            String htmlBody = "<!DOCTYPE html>\n" +
+                    "                <html lang=\"en\">\n" +
+                    "                <head>\n" +
+                    "                    <meta charset=\"UTF-8\">\n" +
+                    "                    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                    "                    <title>MeCare</title>\n" +
+                    "                    <style>\n" +
+                    "                        @media(max-width: 520px) {\n" +
+                    "                            .card {\n" +
+                    "                                width: 90%;\n" +
+                    "                            }\n" +
+                    "                        }\n" +
+                    "                        @media(min-width: 520px) {\n" +
+                    "                            .card {\n" +
+                    "                                width: 50%;\n" +
+                    "                            }\n" +
+                    "                        }\n" +
+                    "                        .card {\n" +
+                    "                            border-radius: 10px;\n" +
+                    "                            margin: 0 auto;\n" +
+                    "                            padding: 20px;\n" +
+                    "                            box-shadow: 0 0 11px -3px rgba(0,0,0,0.8);\n" +
+                    "                        }\n" +
+                    "                        .text {\n" +
+                    "                            font-family:Arial, Helvetica, sans-serif ;\n" +
+                    "                            text-align: center;\n" +
+                    "                        }\n" +
+                    "                        .content-logo {\n" +
+                    "                            display: flex;\n" +
+                    "                            justify-content: center;;\n" +
+                    "                        }\n" +
+                    "                        .img-logo{\n" +
+                    "                            width: 200px;\n" +
+                    "                        }\n" +
+                    "                        .t-center {\n" +
+                    "                            text-align: center;\n" +
+                    "                        }\n" +
+                    "                        .t-justify {\n" +
+                    "                            text-align: justify;\n" +
+                    "                        }\n" +
+                    "                    </style>\n" +
+                    "                </head>\n" +
+                    "                <body>\n" +
+                    "                    <div class=\"card\">\n" +
+                    "                        <div class=\"content-logo\">\n" +
+                    "                            <img class=\"img-logo\" src=\"https://meredith-aesthetic.com/meredith-text-logo.png\"/>\n" +
+                    "                        </div>\n" +
+                    "                        <h4 class=\"text\">Bienvenido a Meredith Aesthetic</h4>\n" +
+                    "                        <p>\n" +
+                    "                            Hola " + nameClient + ",\n"+
+                    "                        </p>\n" +
+                    "                        <p>¡Gracias por unirte a Meredith Aesthetic!</p>\n" +
+                    "                        <p class=\"t-justify\">Es un honor darte la bienvenida como profesional de la estética, belleza o bienestar dentro de nuestra plataforma. Desde hoy, cuentas con un espacio creado especialmente para impulsar tu crecimiento, destacarte entre la competencia y conectar con nuevos clientes.</p>\n" +
+                    "                        <p>En Meredith Aesthetic podrás:</p>\n" +
+                    "                        <ul>\n" +
+                    "                            <li>Mostrar tu trabajo con fotos, precios y servicios</li>\n" +
+                    "                            <li>Aumentar tu visibilidad y atraer clientes interesados en lo que ofreces.</li>\n" +
+                    "                            <li>Gestionar tus citas y agenda de forma sencilla y profesional.</li>\n" +
+                    "                            <li>Recibir notificaciones en tiempo real de nuevas reservas.</li>\n" +
+                    "                            <li>Construir una reputación sólida con valoraciones auténticas.</li>\n" +
+                    "                        </ul>\n" +
+                    "                        <p class=\"t-justify\">Nuestro compromiso es ayudarte a hacer crecer tu negocio mientras te enfocas en lo que mejor sabes hacer: brindar un servicio de calidad.</p>\n" +
+                    "                        <p class=\"t-justify\">Si necesitas apoyo para completar tu perfil o tienes dudas, nuestro equipo está siempre listo para ayudarte.</p>\n" +
+                    "                        <p class=\"t-center\">¡Bienvenido(a) a una nueva etapa profesional!</p>\n" +
+                    "                        <p class=\"t-center\">\n" +
+                    "                El equipo de Meredith Aesthetic\n" +
+                    "                        </p>\n" +
+                    "                    </div>\n" +
+                    "                </body>\n" +
+                    "                </html>";
+            sendMailService.sendEmail(email, "¡Bienvenido(a) a Meredith Aesthetic!", htmlBody);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public ResponseDTO _AccountVerification(String idUser) {
@@ -542,5 +700,12 @@ public class UserService {
     public ResponseDTO _DeleteFavoriteProvider(FavoriteProviderDTO favoriteProviderDTO) {
         favoriteProviderRepository.deleteFavoriteProviderByClient(favoriteProviderDTO.idClient, favoriteProviderDTO.idProvider);
         return ResponseDTO.builder().message("Se elimino de mis favoritos").build();
+    }
+    public ResponseDTO _GetSimpleDateProvider(String idUser) {
+        Optional<UserDTO> userDto = userRepository.findUserSimpleData(idUser);
+        if(userDto.isPresent()) {
+            return ResponseDTO.builder().items(userDto.get()).build();
+        }
+        return ResponseDTO.builder().error(true).message("No se encontro los datos del usuario").build();
     }
 }
